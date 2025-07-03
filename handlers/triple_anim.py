@@ -4,13 +4,20 @@ from telethon.errors import MessageIdInvalidError
 from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
-from client import client
+from client import client, cmd_block
 
 lifetime = 60
 
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
+    if cmd_block:
+        return
+
+    client.loop.create_task(anim(message))
+
+
+async def anim(message: Message):
     chars = ['...', '!!!', '???', ')))']
     for i in chars:
         if i in message.text:

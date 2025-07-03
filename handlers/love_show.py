@@ -4,13 +4,16 @@ from math import cos
 from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
-from client import client
+from client import client, cmd_block, set_cmd_block
 from utils import lerp
 
 
 @client.on(NewMessage(outgoing=True, pattern='lstart'))
 async def command(message: Message):
-    await start(message)
+    if cmd_block:
+        return
+
+    client.loop.create_task(start(message))
 
 
 async def respond(message: Message, text: str):
@@ -25,6 +28,7 @@ def cl_cos(x):
 
 
 async def start(message: Message):
+    set_cmd_block(True)
     mps = 10
 
     dl = 1 / mps
@@ -126,6 +130,8 @@ async def start(message: Message):
     for i in heart:
         messages += [await respond(message, i)]
         await sleep(dl * 2)
+
+    set_cmd_block(False)
 
     if message:
         for c in range(15):
