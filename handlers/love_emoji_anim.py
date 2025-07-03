@@ -9,11 +9,17 @@ from client import client
 lifetime = 60
 
 
-@client.on(NewMessage(outgoing=True, pattern='^❤️$'))
+@client.on(NewMessage(outgoing=True))
 async def command(message: Message):
+    if '❤️' not in message.text:
+        return
+
     for i in range(int(lifetime / 3)):
-        await sleep(3)
         try:
-            await message.edit('💜️' if i % 2 == 0 else '❤️')
+            text = message.text
+            await sleep(3)
+            await message.edit(text.replace('❤️', '💜️'))
+            await sleep(3)
+            await message.edit(text)
         except MessageIdInvalidError:
             return
