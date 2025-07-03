@@ -22,7 +22,10 @@ async def command(message: Message):
     for i in range(int(lifetime / 3.6)):
         try:
             text = message.text
-            for i in range(3):
+            start = 0
+            if len(text) == 3:
+                start = 1
+            for i in range(start, 3):
                 await message.edit(text.replace(l * 3, l * i))
                 await sleep(0.2)
             await message.edit(text)
