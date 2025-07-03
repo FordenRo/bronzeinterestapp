@@ -11,14 +11,11 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if '...' in message.text:
-        l = '.'
-    elif '???' in message.text:
-        l = '?'
-    elif '!!!' in message.text:
-        l = '!'
-    elif ')))' in message.text:
-        l = ')'
+    chars = ['...', '!!!', '???', ')))']
+    for i in chars:
+        if i in message.text:
+            l = i[0]
+            break
     else:
         return
 
