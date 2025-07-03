@@ -11,7 +11,7 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True, pattern='магия'))
 async def command(message: Message):
-    for i in range(int(lifetime / 10)):
+    for i in range(int(lifetime / 6)):
         try:
             text = message.text
             await message.edit(text.replace('магия', 'magic'))
