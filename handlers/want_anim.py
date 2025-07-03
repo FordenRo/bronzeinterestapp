@@ -13,15 +13,20 @@ lifetime = 60
 async def command(message: Message):
     if 'хочу' not in message.text:
         return
+    if 'тебя' not in message.text:
+        return
 
     for i in range(int(lifetime / 7)):
         try:
             await sleep(5)
             text = message.text
-            await message.edit(text.replace('хочу', '||хочу||'))
-            await sleep(1)
+
+            await message.edit(text.replace('хочу', 'want'), parse_mode='html')
+            await sleep(0.2)
+            await message.edit(text.replace('хочу', '<s>want</s>'), parse_mode='html')
+            await sleep(0.2)
+            await message.edit(text.replace('хочу', 'want'), parse_mode='html')
+            await sleep(0.2)
             await message.edit(text)
-            await sleep(2)
-            await message.edit(text.replace('~хочу~'))
         except MessageIdInvalidError:
             return
