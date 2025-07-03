@@ -14,7 +14,7 @@ async def command(message: Message):
     if '❤️' not in message.text:
         return
 
-    for i in range(int(lifetime / 3)):
+    for i in range(int(lifetime / 6)):
         try:
             text = message.text
             await sleep(3)

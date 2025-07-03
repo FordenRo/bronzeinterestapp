@@ -16,7 +16,7 @@ async def command(message: Message):
     if 'тебя' not in message.text:
         return
 
-    for i in range(int(lifetime / 7)):
+    for i in range(int(lifetime / 5.6)):
         try:
             await sleep(5)
             text = message.text
