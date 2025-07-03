@@ -1,6 +1,7 @@
 from client import client
 # noinspection PyUnresolvedReferences
-from handlers import love_emoji_anim, love_show, love_word_anim, magic_anim, stoneface_anim, triple_anim, want_anim
+from handlers import love_emoji_anim, love_show, love_word_anim, magic_anim, repeat_handler, stoneface_anim, \
+    triple_anim, want_anim
 
 
 async def main():
