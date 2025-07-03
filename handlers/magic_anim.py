@@ -17,7 +17,7 @@ async def command(message: Message):
     for i in range(int(lifetime / 6)):
         try:
             text = message.text
-            await message.edit(text.replace('магия', 'magic'))
+            await message.edit(text.replace('магия', '<s>magic</s>'), parse_mode='html')
             await sleep(3)
             await message.edit(text)
             await sleep(3)
