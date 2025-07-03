@@ -11,15 +11,17 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if 'магия' not in message.text:
+    if 'хочу' not in message.text:
         return
 
-    for i in range(int(lifetime / 6)):
+    for i in range(int(lifetime / 7)):
         try:
+            await sleep(5)
             text = message.text
-            await message.edit(text.replace('магия', 'magic'))
-            await sleep(3)
+            await message.edit(text.replace('хочу', '||хочу||'))
+            await sleep(1)
             await message.edit(text)
-            await sleep(3)
+            await sleep(2)
+            await message.edit(text.replace('~хочу~'))
         except MessageIdInvalidError:
             return

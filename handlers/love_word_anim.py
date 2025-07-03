@@ -9,8 +9,11 @@ from client import client
 lifetime = 60
 
 
-@client.on(NewMessage(outgoing=True, pattern='люблю'))
+@client.on(NewMessage(outgoing=True))
 async def command(message: Message):
+    if 'люблю' not in message.text:
+        return
+
     for k in range(int(lifetime / 11.1)):
         try:
             text = message.text
