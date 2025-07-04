@@ -29,7 +29,6 @@ def initiate_handlers():
 
 async def main():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    logging.getLogger('telethon.network.mtprotosender').name = 'telethon'
 
     initiate_handlers()
 
