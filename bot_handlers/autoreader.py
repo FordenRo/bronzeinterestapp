@@ -25,14 +25,14 @@ async def command(message: Message):
         return
 
     if not onetime:
-        config.auto_read[user.id] = silent
+        config.auto_read[str(user.id)] = silent
     register_auto_read(user.id, silent, onetime)
     await message.respond(
         f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}',
         parse_mode='html')
 
 
-def register_auto_read(id: int, silent: bool, onetime: bool):
+def register_auto_read(id: int, silent: bool, onetime: bool = False):
     @client.on(NewMessage([id], incoming=True))
     async def on_message(message: Message):
         await message.mark_read()
