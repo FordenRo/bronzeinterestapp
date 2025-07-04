@@ -3,26 +3,45 @@ from importlib import import_module
 import os
 import logging
 
-from client import client
+from client import client, bot
+from config import config
+
 
 def initiate_handlers():
-    logging.getLogger().info('Initiating handlers...')
-    for handler in os.listdir('handlers'):
+    logging.info('Initiating client handlers...')
+    for handler in os.listdir('client_handlers'):
         name, ext = os.path.splitext(handler)
         if ext != '.py':
             continue
 
-        logging.getLogger().info(f'{name} initiated')
-        import_module(f'handlers.{name}')
+        logging.info(f'{name} initiated')
+        import_module(f'client_handlers.{name}')
+
+    logging.info('Initiating bot handlers...')
+    for handler in os.listdir('bot_handlers'):
+        name, ext = os.path.splitext(handler)
+        if ext != '.py':
+            continue
+
+        logging.info(f'{name} initiated')
+        import_module(f'bot_handlers.{name}')
 
 
 async def main():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    logging.getLogger('telethon.network.mtprotosender').name = 'telethon'
+
     initiate_handlers()
-    logging.getLogger().info('Started successfully')
+
+    await bot.send_message((await client.get_me()).id, 'Started')
+    logging.info('Started successfully')
     await client.disconnected
 
 
 if __name__ == '__main__':
     with client:
-        client.loop.run_until_complete(main())
+        try:
+            client.loop.run_until_complete(main())
+        except KeyboardInterrupt:
+            logging.info('Stopping')
+            config.save()

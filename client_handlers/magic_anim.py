@@ -6,28 +6,26 @@ from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
 from client import client
-from handlers.read_handler import register_on_read_event
+from client_handlers.read_handler import register_on_read_event
 
-chars = '.!)?'
+lifetime = 60
 
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if not re.search(f'[{chars}]' + '{2}', message.text):
+    if not re.search('магия', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    part = re.search(f'(?=[{chars}]' + '{2})' + f'[{chars}]+', message.text).group()
-
-    for _ in range(3):
+    for i in range(int(lifetime / 6)):
         try:
+            part = re.search('магия', message.text, re.IGNORECASE).group()
+            await message.edit(message.text.replace(part, '<s>magic</s>'), parse_mode='html')
             await sleep(3)
-            eq = len(message.text) == len(part)
-            for i in range(1 if eq else 0, len(part) + 1):
-                await message.edit(message.text.replace(part, part[:i]))
-                await sleep(0.2)
+            await message.edit(message.text)
+            await sleep(3)
         except MessageIdInvalidError:
             return
