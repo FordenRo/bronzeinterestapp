@@ -13,8 +13,11 @@ def lerp(a, b, t):
     return a * (1 - t) + b * t
 
 
-async def get_user(id: str | int) -> UserEmpty | User:
-    return (await client(GetFullUserRequest(id))).users[0]
+async def get_user(id: str | int) -> UserEmpty | User | None:
+    try:
+        return (await client(GetFullUserRequest(id))).users[0]
+    except ValueError:
+        return None
 
 
 def user_to_link(user: User | UserEmpty):
