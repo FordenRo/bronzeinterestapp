@@ -14,34 +14,37 @@ if config.auto_read is None:
     config.auto_read = {}
 
 
-@bot.on(NewMessage(incoming=True, pattern='autoreader @[a-zA-Z0-9_]+ ?(silent)?'))
+@bot.on(NewMessage(incoming=True, pattern='autoreader @[a-zA-Z0-9_]+ ?(silent)? ?(onetime)?'))
 async def command(message: Message):
-    nickname, silent = re.match('autoreader (@[a-zA-Z0-9_]+) ?(silent)?', message.text).groups()
+    nickname, silent, onetime = re.match('autoreader (@[a-zA-Z0-9_]+) ?(silent)? ?(onetime)?', message.text).groups()
     silent = bool(silent)
+    onetime = bool(onetime)
     user = await get_user(nickname)
     if not user:
         await message.respond('User not found')
         return
 
-    config.auto_read[user.id] = silent
-    register_auto_read(user.id, silent)
+    if not onetime:
+        config.auto_read[user.id] = silent
+    register_auto_read(user.id, silent, onetime)
     await message.respond(
         f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}',
         parse_mode='html')
 
 
-def register_auto_read(id: int, silent: bool):
+def register_auto_read(id: int, silent: bool, onetime: bool):
     @client.on(NewMessage([id], incoming=True))
     async def on_message(message: Message):
-        nonlocal silent
-
         await message.mark_read()
         if not silent:
             user = await get_user(id)
             await bot.send_message((await client.get_me()).id, f'Message from {user_to_link(user)}: {message.text}',
                                    parse_mode='html')
+        if onetime:
+            client.remove_event_handler(on_message)
 
-    tasks[id] = on_message
+    if not onetime:
+        tasks[id] = on_message
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader remove @[a-zA-Z0-9_]+'))
@@ -66,7 +69,7 @@ async def autoreader_list(message: Message):
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader help'))
 async def help(message: Message):
-    await message.respond('\n'.join(['autoreader @nickname silent? - automaticaly read messages from user',
+    await message.respond('\n'.join(['autoreader @nickname silent? onetime? - automaticaly read messages from user',
                                      'autoreader remove @nickname - remove autoreader from user',
                                      'autoreader list - autoreader user list',
                                      'autoreader help - this message']))

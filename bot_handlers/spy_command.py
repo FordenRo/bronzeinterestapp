@@ -13,35 +13,43 @@ if config.spy_list is None:
     config.spy_list = {'online': [], 'read': []}
 
 
-@bot.on(NewMessage(incoming=True, pattern='spy (online|read) @[a-zA-Z0-9_]+'))
+@bot.on(NewMessage(incoming=True, pattern='spy (online|read) @[a-zA-Z0-9_]+ ?(onetime)?'))
 async def command(message: Message):
-    type, nickname = re.match('spy (online|read) (@[a-zA-Z0-9_]+)', message.text).groups()
+    type, nickname, onetime = re.match('spy (online|read) (@[a-zA-Z0-9_]+) ?(onetime)?', message.text).groups()
+    onetime = bool(onetime)
     user = await get_user(nickname)
     if not user:
         await message.respond('User not found')
         return
 
-    config.spy_list[type] += [user.id]
-    register_spy(type, user.id)
+    if not onetime:
+        config.spy_list[type] += [user.id]
+    register_spy(type, user.id, onetime)
     await message.respond(f'{user_to_link(user)} will now spy {type}', parse_mode='html')
 
 
-def register_spy(type: str, id: int):
+def register_spy(type: str, id: int, onetime: bool):
     if type == 'online':
         @client.on(UserUpdate([id]))
         async def on_update(event: UserUpdate.Event):
             if event.online:
                 await bot.send_message((await client.get_me()).id, f'{user_to_link(await event.get_chat())} is online!',
                                        parse_mode='html')
+                if onetime:
+                    client.remove_event_handler(on_update)
 
-        tasks['online'][id] = on_update
+        if not onetime:
+            tasks['online'][id] = on_update
     elif type == 'read':
         @client.on(MessageRead([id]))
         async def on_read(event: MessageRead.Event):
             await bot.send_message((await client.get_me()).id,
                                    f'{user_to_link(await event.get_chat())} has read your messages!', parse_mode='html')
+            if onetime:
+                client.remove_event_handler(on_update)
 
-        tasks['read'][id] = on_read
+        if not onetime:
+            tasks['read'][id] = on_read
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy remove (online|read) @[a-zA-Z0-9_]+'))
@@ -67,7 +75,7 @@ async def spy_list(message: Message):
 
 @bot.on(NewMessage(incoming=True, pattern='spy help'))
 async def spy_help(message: Message):
-    await message.respond('\n'.join(['spy online|read @username - register spy',
+    await message.respond('\n'.join(['spy online|read @username onetime? - register spy',
                                      'spy remove online|read @username - remove from spy',
                                      'spy list - spy user list',
                                      'spy help - this message']))
