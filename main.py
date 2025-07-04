@@ -1,11 +1,25 @@
+import sys
+from importlib import import_module
+import os
+import logging
+
 from client import client
-# noinspection PyUnresolvedReferences
-from handlers import (repeat_handler, love_emoji_anim, love_show,
-                      love_word_anim, magic_anim, stoneface_anim,
-                      triple_anim, want_anim, haha_anim)
+
+def initiate_handlers():
+    logging.getLogger().info('Initiating handlers...')
+    for handler in os.listdir('handlers'):
+        name, ext = os.path.splitext(handler)
+        if ext != '.py':
+            continue
+
+        logging.getLogger().info(f'{name} initiated')
+        import_module(f'handlers.{name}')
 
 
 async def main():
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    initiate_handlers()
+    logging.getLogger().info('Started successfully')
     await client.disconnected
 
 
