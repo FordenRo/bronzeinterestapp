@@ -1,6 +1,7 @@
+import re
 from asyncio import sleep
 
-from telethon.errors import MessageIdInvalidError
+from telethon.errors import MessageIdInvalidError, MessageNotModifiedError
 from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
@@ -12,7 +13,7 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if 'люблю' not in message.text:
+    if not re.search('люблю', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
@@ -21,27 +22,21 @@ async def command(message: Message):
 async def anim(message: Message):
     for k in range(int(lifetime / 11.1)):
         try:
-            text = message.text
-            start = text.find('люблю')
-            end = start + 5
+            part = re.search('люблю', message.text, re.IGNORECASE).group()
             for i in range(5):
-                l = list(text)
-                word = list('люблю')
-                word[i] = word[i].upper()
-                l[start:end] = word
-                await message.edit(''.join(l))
+                word = list(part)
+                word[i] = word[i].upper() if word[i].islower() else word[i].lower()
+                await message.edit(message.text.replace(part, ''.join(word)))
                 await sleep(0.1)
-            await message.edit(text)
+            await message.edit(message.text)
 
             await sleep(5)
 
             for i in range(3):
-                l = list(text)
-                l[start:end] = ('❤️' if i % 2 == 0 else '💜️') * 3
-                await message.edit(''.join(l))
+                await message.edit(message.text.replace(part, ('❤️' if i % 2 == 0 else '💜️') * 3))
                 await sleep(0.2)
 
-            await message.edit(text)
+            await message.edit(message.text)
             await sleep(5)
         except MessageIdInvalidError:
             return
