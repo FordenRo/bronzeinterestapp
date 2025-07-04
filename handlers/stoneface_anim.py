@@ -5,6 +5,7 @@ from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
 from client import client
+from handlers.read_handler import register_on_read_event
 
 lifetime = 60
 
@@ -14,7 +15,7 @@ async def command(message: Message):
     if '-_-' not in message.text:
         return
 
-    client.loop.create_task(anim(message))
+    register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
