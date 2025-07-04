@@ -1,3 +1,5 @@
+from logging import Handler
+
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import User, UserEmpty
 
@@ -21,3 +23,9 @@ def user_to_link(user: User | UserEmpty):
         link = f'tg://user?id={user.id}'
 
     return f'<a href="{link}">{user.first_name}{f' {user.last_name}' if user.last_name else ''}</a>'
+
+
+class LogHandler(Handler):
+    def handle(self, record):
+        print(record.getMessage())
+        print(record.exc_text)

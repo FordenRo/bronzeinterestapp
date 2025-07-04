@@ -5,6 +5,7 @@ import logging
 
 from client import client, bot
 from config import config
+from utils import LogHandler
 
 
 def initiate_handlers():
@@ -28,7 +29,7 @@ def initiate_handlers():
 
 
 async def main():
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    logging.basicConfig(level=logging.INFO, handlers=[LogHandler()])
 
     initiate_handlers()
 

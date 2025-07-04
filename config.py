@@ -1,5 +1,6 @@
 import json
 import os
+from io import StringIO
 
 
 class Configuration(object):
@@ -33,3 +34,4 @@ class Configuration(object):
 
 
 config = Configuration('config.json')
+logging_io = StringIO()
