@@ -19,13 +19,13 @@ async def online(message: Message):
 
     if state != current_state:
         current_state = state
-        await message.respond('now you will be online' if state else 'always online turned off')
+        await message.respond('Now you will be online' if state else 'Always online turned off')
         if state:
             online_task = await always_online_handler()
         elif not state:
             client.remove_event_handler(online_task)
     else:
-        await message.respond('nothing changed')
+        await message.respond('Nothing changed')
 
 
 async def always_online_handler():
@@ -42,7 +42,7 @@ async def always_online_handler():
 
 @bot.on(NewMessage(incoming=True, pattern='online (state|status)'))
 async def online_state(message: Message):
-    await message.respond(f'always online is {'on' if current_state else 'off'}')
+    await message.respond(f'Always online is {'on' if current_state else 'off'}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='online help'))
