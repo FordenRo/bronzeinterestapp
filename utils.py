@@ -1,11 +1,12 @@
 from asyncio import sleep
 from logging import Handler
+import logging
 
 from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import User, UserEmpty
 
-from client import client
+from client import bot, client
 
 
 def lerp(a, b, t):
@@ -36,6 +37,10 @@ class TgLogHandler(Handler):
         self._task = None
 
     def handle(self, record):
+        if record.levelno >= logging.WARN:
+            client.loop.create_task(bot.send_message(client._self_id, f'<pre>{self.format(record)}</pre>', parse_mode='html'))
+            return
+
         self.content += self.format(record) + '\n'
         if self._task:
             return

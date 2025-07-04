@@ -36,6 +36,7 @@ async def main():
                         style='{',
                         datefmt='%H:%M',
                         handlers=[StreamHandler(sys.stdout), TgLogHandler(msg)])
+    logging.getLogger('telethon.client.updates').setLevel(logging.DEBUG)
 
     initiate_handlers()
 
