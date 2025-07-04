@@ -34,4 +34,3 @@ class Configuration(object):
 
 
 config = Configuration('config.json')
-logging_io = StringIO()

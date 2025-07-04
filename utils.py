@@ -1,5 +1,7 @@
+from asyncio import sleep
 from logging import Handler
 
+from telethon.tl.custom import Message
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import User, UserEmpty
 
@@ -25,7 +27,22 @@ def user_to_link(user: User | UserEmpty):
     return f'<a href="{link}">{user.first_name}{f' {user.last_name}' if user.last_name else ''}</a>'
 
 
-class LogHandler(Handler):
+class TgLogHandler(Handler):
+    def __init__(self, message: Message):
+        super().__init__()
+
+        self.message = message
+        self.content = ''
+        self._task = None
+
     def handle(self, record):
-        print(record.getMessage())
-        print(record.exc_text)
+        self.content += self.format(record) + '\n'
+        if self._task:
+            return
+
+        self._task = client.loop.create_task(self.update())
+
+    async def update(self):
+        await sleep(0.5)
+        await self.message.edit(f'<pre>{self.content}</pre>', parse_mode='html')
+        self._task = None

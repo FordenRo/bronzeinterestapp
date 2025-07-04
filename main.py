@@ -1,11 +1,12 @@
+import logging
+import os
 import sys
 from importlib import import_module
-import os
-import logging
+from logging import StreamHandler
 
-from client import client, bot
+from client import bot, client
 from config import config
-from utils import LogHandler
+from utils import TgLogHandler
 
 
 def initiate_handlers():
@@ -29,11 +30,15 @@ def initiate_handlers():
 
 
 async def main():
-    logging.basicConfig(level=logging.INFO, handlers=[LogHandler()])
+    msg = await bot.send_message((await client.get_me()).id, 'log')
+    logging.basicConfig(level=logging.INFO,
+                        format='[{asctime} {levelname}] ({name}) {msg}',
+                        style='{',
+                        datefmt='%H:%M',
+                        handlers=[StreamHandler(sys.stdout), TgLogHandler(msg)])
 
     initiate_handlers()
 
-    await bot.send_message((await client.get_me()).id, 'Started')
     logging.info('Started successfully')
     await client.disconnected
 
