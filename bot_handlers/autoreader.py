@@ -46,11 +46,11 @@ def register_auto_read(id: int, silent: bool):
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader remove @[a-zA-Z0-9_]+'))
 async def autoreader_remove(message: Message):
-    nickname = re.match('autoreader (@[a-zA-Z0-9_]+)', message.text).group(1)
+    nickname = re.match('autoreader remove (@[a-zA-Z0-9_]+)', message.text).group(1)
     user = await get_user(nickname)
 
-    if user.id in config.auto_read:
-        config.auto_read.pop(nickname)
+    if str(user.id) in config.auto_read:
+        config.auto_read.pop(str(user.id))
         client.remove_event_handler(tasks[user.id])
         await message.respond(f'Autoreader removed from {user_to_link(user)}', parse_mode='html')
     else:
