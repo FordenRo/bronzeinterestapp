@@ -8,8 +8,6 @@ from telethon.tl.custom import Message
 from client import client
 from handlers.read_handler import register_on_read_event
 
-lifetime = 10
-
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):

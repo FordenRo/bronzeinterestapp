@@ -1,3 +1,4 @@
+import re
 from asyncio import sleep
 
 from telethon.errors import MessageIdInvalidError
@@ -12,7 +13,7 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if 'магия' not in message.text:
+    if not re.search('магия', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
@@ -21,10 +22,10 @@ async def command(message: Message):
 async def anim(message: Message):
     for i in range(int(lifetime / 6)):
         try:
-            text = message.text
-            await message.edit(text.replace('магия', '<s>magic</s>'), parse_mode='html')
+            part = re.search('магия', message.text, re.IGNORECASE).group()
+            await message.edit(message.text.replace(part, '<s>magic</s>'), parse_mode='html')
             await sleep(3)
-            await message.edit(text)
+            await message.edit(message.text)
             await sleep(3)
         except MessageIdInvalidError:
             return
