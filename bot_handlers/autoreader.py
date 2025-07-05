@@ -28,8 +28,7 @@ async def command(message: Message):
         config.auto_read[str(user.id)] = silent
     register_auto_read(user.id, silent, onetime)
     await message.respond(
-        f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}',
-        parse_mode='html')
+        f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}')
 
 
 def register_auto_read(id: int, silent: bool, onetime: bool = False):
@@ -38,8 +37,7 @@ def register_auto_read(id: int, silent: bool, onetime: bool = False):
         await message.mark_read()
         if not silent:
             user = await get_user(id)
-            await bot.send_message((await client.get_me()).id, f'Message from {user_to_link(user)}: {message.text}',
-                                   parse_mode='html')
+            await bot.send_message((await client.get_me()).id, f'Message from {user_to_link(user)}: {message.text}')
         if onetime:
             client.remove_event_handler(on_message)
 
@@ -55,7 +53,7 @@ async def autoreader_remove(message: Message):
     if str(user.id) in config.auto_read:
         config.auto_read.pop(str(user.id))
         client.remove_event_handler(tasks[user.id])
-        await message.respond(f'Autoreader removed from {user_to_link(user)}', parse_mode='html')
+        await message.respond(f'Autoreader removed from {user_to_link(user)}')
     else:
         await message.respond('User not found')
 
@@ -64,7 +62,7 @@ async def autoreader_remove(message: Message):
 async def autoreader_list(message: Message):
     user_list = [f'{user_to_link(await get_user(int(i)))}{' silent' if config.auto_read[i] else ''}' for i in
                  config.auto_read]
-    await message.respond('Autoreader:\n' + '\n'.join(user_list), parse_mode='html')
+    await message.respond('Autoreader:\n' + '\n'.join(user_list))
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader help'))

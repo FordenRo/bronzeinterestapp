@@ -30,7 +30,10 @@ def initiate_handlers():
 
 
 async def main():
+    bot.parse_mode = 'html'
     msg = await bot.send_message((await client.get_me()).id, 'log')
+    await bot.pin_message(client._self_id, msg.id)
+
     logging.basicConfig(level=logging.INFO,
                         format='[{asctime} {levelname}] ({name}) {msg}',
                         style='{',
@@ -43,6 +46,10 @@ async def main():
     logging.info('Started successfully')
     await client.disconnected
 
+    await bot.unpin_message(client._self_id, msg.id)
+    logging.info('Stopped')
+    config.save()
+
 
 if __name__ == '__main__':
     with client:
@@ -50,4 +57,4 @@ if __name__ == '__main__':
             client.loop.run_until_complete(main())
         except KeyboardInterrupt:
             logging.info('Stopping')
-            config.save()
+

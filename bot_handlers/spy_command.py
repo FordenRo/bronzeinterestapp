@@ -25,7 +25,7 @@ async def command(message: Message):
     if not onetime:
         config.spy_list[type] += [user.id]
     register_spy(type, user.id, onetime)
-    await message.respond(f'{user_to_link(user)} will now spy {type}', parse_mode='html')
+    await message.respond(f'{user_to_link(user)} will now spy {type}')
 
 
 def register_spy(type: str, id: int, onetime: bool):
@@ -33,8 +33,7 @@ def register_spy(type: str, id: int, onetime: bool):
         @client.on(UserUpdate([id]))
         async def on_update(event: UserUpdate.Event):
             if event.online:
-                await bot.send_message((await client.get_me()).id, f'{user_to_link(await event.get_chat())} is online!',
-                                       parse_mode='html')
+                await bot.send_message((await client.get_me()).id, f'{user_to_link(await event.get_chat())} is online!')
                 if onetime:
                     client.remove_event_handler(on_update)
 
@@ -44,7 +43,7 @@ def register_spy(type: str, id: int, onetime: bool):
         @client.on(MessageRead([id]))
         async def on_read(event: MessageRead.Event):
             await bot.send_message((await client.get_me()).id,
-                                   f'{user_to_link(await event.get_chat())} has read your messages!', parse_mode='html')
+                                   f'{user_to_link(await event.get_chat())} has read your messages!')
             if onetime:
                 client.remove_event_handler(on_update)
 
@@ -60,7 +59,7 @@ async def remove(message: Message):
     if user.id in config.spy_list[type]:
         config.spy_list[type].remove(user.id)
         client.remove_event_handler(tasks[type][user.id])
-        await message.respond(f'{user_to_link(user)} removed from spy', parse_mode='html')
+        await message.respond(f'{user_to_link(user)} removed from spy')
     else:
         await message.respond('User not found')
 
@@ -69,8 +68,7 @@ async def remove(message: Message):
 async def spy_list(message: Message):
     online_list = [user_to_link(await get_user(i)) for i in config.spy_list['online']]
     read_list = [user_to_link(await get_user(i)) for i in config.spy_list['read']]
-    await message.respond('Online:\n' + '\n'.join(online_list) + '\n\nRead:\n' + '\n'.join(read_list),
-                          parse_mode='html')
+    await message.respond('Online:\n' + '\n'.join(online_list) + '\n\nRead:\n' + '\n'.join(read_list))
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy help'))
