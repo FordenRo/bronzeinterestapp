@@ -53,5 +53,10 @@ class TgLogHandler(Handler):
 
     async def update(self):
         await sleep(0.5)
-        await self.message.edit(f'<pre>{self.content}</pre>')
+        text = self.content
+        if len(text) > 2048:
+            text = text[-2048:]
+            text = '\n'.join(text.splitlines()[1:])
+
+        await self.message.edit(f'<pre>{text}</pre>')
         self._task = None
