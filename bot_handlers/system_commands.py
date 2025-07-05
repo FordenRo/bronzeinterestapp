@@ -33,5 +33,5 @@ async def update(message: Message):
 
     await message.respond(f'<pre>{output}</pre>')
 
-    if output != 'Already up to date.':
+    if 'up to date' not in output:
         await restart(message)
