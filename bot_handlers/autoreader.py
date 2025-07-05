@@ -1,3 +1,4 @@
+import logging
 import re
 
 from telethon.events import NewMessage
@@ -41,6 +42,7 @@ def register_auto_read(id: int, silent: bool, onetime: bool = False):
         if onetime:
             client.remove_event_handler(on_message)
 
+    logging.getLogger('autoreader').info(f'Registered user {id}')
     if not onetime:
         tasks[id] = on_message
 

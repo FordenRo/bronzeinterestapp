@@ -1,3 +1,4 @@
+import logging
 import re
 
 from telethon.events import MessageRead, NewMessage, UserUpdate
@@ -49,6 +50,7 @@ def register_spy(type: str, id: int, onetime: bool):
 
         if not onetime:
             tasks['read'][id] = on_read
+    logging.getLogger('spy').info(f'Registered spy {type} on user {id}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy remove (online|read) @[a-zA-Z0-9_]+'))

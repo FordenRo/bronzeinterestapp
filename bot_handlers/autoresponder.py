@@ -1,3 +1,4 @@
+import logging
 import re
 
 from telethon.events import NewMessage
@@ -7,9 +8,9 @@ from client import bot, client
 from utils import get_user, user_to_link
 
 
-@bot.on(NewMessage(incoming=True, pattern='autorespond @[a-zA-Z0-9_]+ ?(silent)? .*'))
+@bot.on(NewMessage(incoming=True, pattern='autoresponder @[a-zA-Z0-9_]+ ?(silent)? .*'))
 async def command(message: Message):
-    nickname, silent, text = re.match('autorespond (@[a-zA-Z0-9]+) ?(silent)? (.*)', message.text).groups()
+    nickname, silent, text = re.match('autoresponder (@[a-zA-Z0-9]+) ?(silent)? (.*)', message.text).groups()
     user = await get_user(nickname)
     silent = bool(silent)
     if not user:
@@ -28,9 +29,10 @@ def register_respond(id: int, text: str, silent: bool):
             await bot.send_message((await client.get_me()).id, f'Message from {user_to_link(user)}: {message.text}')
 
         client.remove_event_handler(on_message)
+    logging.getLogger('autoresponder').info(f'Registered user {id} with text: {text}')
 
 
-@bot.on(NewMessage(incoming=True, pattern='autorespond help'))
+@bot.on(NewMessage(incoming=True, pattern='autoresponder help'))
 async def autorespond_help(message: Message):
-    await message.respond('\n'.join(['autorespond @nickname silent? text - register autorespond',
-                                     'autorespond help - this message']))
+    await message.respond('\n'.join(['autoresponder @nickname silent? text - register autoresponder',
+                                     'autoresponder help - this message']))
