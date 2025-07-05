@@ -47,7 +47,7 @@ async def main():
     stream = StreamHandler(StringIO())
     stream.name = 'Stream'
     logging.basicConfig(level=logging.INFO,
-                        format='[{asctime} {levelname}] ({name}) {message}',
+                        format='{asctime} [{levelname}] ({name}) {message}',
                         style='{',
                         datefmt='%H:%M',
                         handlers=[StreamHandler(sys.stdout), TgLogHandler(msg), stream])

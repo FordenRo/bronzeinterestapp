@@ -49,7 +49,7 @@ class TgLogHandler(Handler):
                 return
 
             client.loop.create_task(bot.send_message(
-                client._self_id, f'<pre>{self.format(record)}</pre>'))
+                client._self_id, f'<pre><code class="language-log">{self.format(record)}</code></pre>'))
             return
 
         self.content += self.format(record) + '\n'
@@ -68,5 +68,5 @@ class TgLogHandler(Handler):
         if self.message is None:
             return
 
-        await self.message.edit(f'<pre>{text}</pre>')
+        await self.message.edit(f'<pre><code class="language-log">{text}</code></pre>')
         self._task = None
