@@ -42,7 +42,6 @@ async def main():
     if not isinstance(msg, Message):
         raise ValueError('msg is not a Message')
 
-    await bot.pin_message(client._self_id, None)
     await bot.pin_message(client._self_id, msg.id)
 
     stream = StreamHandler(StringIO())
