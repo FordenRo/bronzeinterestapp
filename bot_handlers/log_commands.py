@@ -1,17 +1,22 @@
 import logging
+from io import BytesIO, StringIO
+from logging import StreamHandler
 
 from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
-from client import bot, client
+from client import bot
 from utils import TgLogHandler
 
 
 @bot.on(NewMessage(incoming=True, pattern='log send'))
 async def send_log(message: Message):
-    log: TgLogHandler | None = logging.getHandlerByName('TelegramLog')
+    log: StreamHandler | None = logging.getHandlerByName('Stream')
+    stream: StringIO = log.stream
 
-    await bot.send_file(message.chat_id, log.content, caption='interest.log')
+    io = BytesIO(stream.getvalue().encode('utf8'))
+    io.name = 'interest.log'
+    await bot.send_file(message.chat_id, io)
 
 
 @bot.on(NewMessage(incoming=True, pattern='log (clear|cls)'))

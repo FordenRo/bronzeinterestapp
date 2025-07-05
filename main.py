@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from importlib import import_module
+from io import StringIO
 from logging import StreamHandler
 
 from client import bot, client
@@ -35,11 +36,13 @@ async def main():
     msg = await bot.send_message(me.id, 'log')
     await bot.pin_message(me.id, msg.id)
 
+    stream = StreamHandler(StringIO())
+    stream.name = 'Stream'
     logging.basicConfig(level=logging.INFO,
-                        format='[{asctime} {levelname}] ({name}) {msg}',
+                        format='[{asctime} {levelname}] ({name}) {message}',
                         style='{',
                         datefmt='%H:%M',
-                        handlers=[StreamHandler(sys.stdout), TgLogHandler(msg)])
+                        handlers=[StreamHandler(sys.stdout), TgLogHandler(msg), stream])
     logging.getLogger('telethon.client.updates').setLevel(logging.WARN)
 
     initiate_handlers()
