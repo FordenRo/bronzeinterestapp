@@ -11,6 +11,7 @@ from config import config
 from utils import get_user, user_to_link
 
 tasks = {'online': {}, 'read': {}}
+onetime_tasks = {'online': {}, 'read': {}}
 
 if 'spy_list' not in config:
     config['spy_list'] = {'online': [], 'read': []}
@@ -54,8 +55,11 @@ def register_spy(type: str, id: int, onetime: bool = False):
                 await bot.send_message(client._self_id, f'{user_to_link(chat)} is online!')
                 if onetime:
                     client.remove_event_handler(on_update)
+                    onetime_tasks['online'].pop(id)
 
-        if not onetime:
+        if onetime:
+            onetime_tasks['online'][id] = on_update
+        else:
             tasks['online'][id] = on_update
     elif type == 'read':
         @client.on(MessageRead([id]))
@@ -70,9 +74,13 @@ def register_spy(type: str, id: int, onetime: bool = False):
             await bot.send_message(client._self_id, f'{user_to_link(chat)} has read your messages!')
             if onetime:
                 client.remove_event_handler(on_update)
+                onetime_tasks['read'].pop(id)
 
-        if not onetime:
+        if onetime:
+            onetime_tasks['read'][id] = on_read
+        else:
             tasks['read'][id] = on_read
+
     logging.getLogger('spy').info(f'Registered spy {type} on user {id}')
 
 
@@ -91,18 +99,26 @@ async def remove(message: Message):
         await message.respond('User not found')
         return
 
-    if user.id in config['spy_list'][type]:
-        config['spy_list'][type].remove(user.id)
+    if str(user.id) in onetime_tasks[type]:
+        client.remove_event_handler(onetime_tasks[type][user.id])
+        onetime_tasks[type].pop(user.id)
+    elif str(user.id) in tasks[type]:
         client.remove_event_handler(tasks[type][user.id])
-        await message.respond(f'{user_to_link(user)} removed from spy')
+        tasks[type].pop(user.id)
+        config['spy_list'][type].remove(user.id)
     else:
-        await message.respond('User not found')
+        await message.respond('User not in spy list')
+        return
+
+    await message.respond(f'{user_to_link(user)} removed from spy')
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy list'))
 async def spy_list(message: Message):
     online_list = await gather(*[get_user(i) for i in config['spy_list']['online']])
     read_list = await gather(*[get_user(i) for i in config['spy_list']['read']])
+    online_list += await gather(*[get_user(i) for i in onetime_tasks['online']])
+    read_list += await gather(*[get_user(i) for i in onetime_tasks['read']])
     online_list = [user_to_link(user)
                    for user in online_list if user is not None]
     read_list = [user_to_link(user) for user in read_list if user is not None]
