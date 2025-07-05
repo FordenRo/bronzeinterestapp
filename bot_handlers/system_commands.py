@@ -32,7 +32,7 @@ async def update(message: Message):
     output = stdout.decode('utf8')
 
     if 'up to date' not in output:
-        await message.respond(f'<pre>{output}</pre>')
+        await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
         await restart(message)
     else:
         await message.respond('Already up to date')
