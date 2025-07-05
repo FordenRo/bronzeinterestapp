@@ -35,6 +35,7 @@ class TgLogHandler(Handler):
     def __init__(self, message: Message):
         super().__init__()
 
+        self.name = 'TelegramLog'
         self.message = message
         self.content = ''
         self._task = None
