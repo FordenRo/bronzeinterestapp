@@ -13,14 +13,21 @@ chars = '.!)?'
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if not re.search(f'[{chars}]' + '{2}', message.text):
+    if not message.text or not re.search(f'[{chars}]' + '{2}', message.text):
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    part = re.search(f'(?=[{chars}]' + '{2})' + f'[{chars}]+', message.text).group()
+    if not message.text:
+        return
+
+    part = re.search(f'(?=[{chars}]' + '{2})' + f'[{chars}]+', message.text)
+    if not part:
+        return
+
+    part = part.group()
 
     for _ in range(3):
         try:

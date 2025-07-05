@@ -13,13 +13,16 @@ emojis = ['💜️', '🩷', '💛', '💙', '💚']
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if '❤️' not in message.text:
+    if not message.text or '❤️' not in message.text:
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
+    if not message.text:
+        return
+
     for i in range(int(lifetime / (3 + len(emojis) * 3))):
         try:
             text = message.text

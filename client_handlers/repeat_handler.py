@@ -15,12 +15,18 @@ async def command(message: Message):
 
 
 async def repeat(message: Message):
+    if not message.text:
+        return
+
     try:
-        text = message.text
-        count, msg = re.match('.r(\\d+) (.*)', text).groups()
+        match = re.match('.r(\\d+) (.*)', message.text)
+        if not match:
+            return
+
+        count, msg = match.groups()
         client.loop.create_task(message.delete())
         tasks = []
-        for i in range(int(count)):
+        for _ in range(int(count)):
             tasks += [client.loop.create_task(message.respond(msg))]
     except MessageIdInvalidError:
         return

@@ -1,8 +1,10 @@
+from asyncio import gather
 import logging
 import re
 
 from telethon.events import NewMessage
 from telethon.tl.custom import Message
+from telethon.tl.types import User
 
 from client import bot, client
 from config import config
@@ -11,13 +13,21 @@ from utils import get_user, user_to_link
 current_state = False
 tasks = {}
 
-if config.auto_read is None:
-    config.auto_read = {}
+if 'auto_read' not in config:
+    config['auto_read'] = {}
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader @[a-zA-Z0-9_]+ ?(silent)? ?(onetime)?'))
 async def command(message: Message):
-    nickname, silent, onetime = re.match('autoreader (@[a-zA-Z0-9_]+) ?(silent)? ?(onetime)?', message.text).groups()
+    if not message.text:
+        return
+
+    match = re.match(
+        'autoreader (@[a-zA-Z0-9_]+) ?(silent)? ?(onetime)?', message.text)
+    if not match:
+        return
+
+    nickname, silent, onetime = match.groups()
     silent = bool(silent)
     onetime = bool(onetime)
     user = await get_user(nickname)
@@ -26,7 +36,8 @@ async def command(message: Message):
         return
 
     if not onetime:
-        config.auto_read[str(user.id)] = silent
+        config['auto_read'][str(user.id)] = silent
+
     register_auto_read(user.id, silent, onetime)
     await message.respond(
         f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}')
@@ -38,7 +49,14 @@ def register_auto_read(id: int, silent: bool, onetime: bool = False):
         await message.mark_read()
         if not silent:
             user = await get_user(id)
-            await bot.send_message((await client.get_me()).id, f'Message from {user_to_link(user)}: {message.text}')
+            if not isinstance(user, User):
+                return
+
+            if client._self_id is None:
+                return
+
+            await bot.send_message(client._self_id, f'Message from {user_to_link(user)}: {message.text}')
+
         if onetime:
             client.remove_event_handler(on_message)
 
@@ -49,22 +67,36 @@ def register_auto_read(id: int, silent: bool, onetime: bool = False):
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader remove @[a-zA-Z0-9_]+'))
 async def autoreader_remove(message: Message):
-    nickname = re.match('autoreader remove (@[a-zA-Z0-9_]+)', message.text).group(1)
-    user = await get_user(nickname)
+    if not message.text:
+        return
 
-    if str(user.id) in config.auto_read:
-        config.auto_read.pop(str(user.id))
+    match = re.match('autoreader remove (@[a-zA-Z0-9_]+)', message.text)
+    if not match:
+        return
+
+    nickname = match.group(1)
+    user = await get_user(nickname)
+    if not isinstance(user, User):
+        await message.respond('User not found')
+        return
+
+    if str(user.id) in config['auto_read']:
+        config['auto_read'].pop(str(user.id))
         client.remove_event_handler(tasks[user.id])
         await message.respond(f'Autoreader removed from {user_to_link(user)}')
     else:
-        await message.respond('User not found')
+        await message.respond('User not in autoreader list')
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader list'))
 async def autoreader_list(message: Message):
-    user_list = [f'{user_to_link(await get_user(int(i)))}{' silent' if config.auto_read[i] else ''}' for i in
-                 config.auto_read]
-    await message.respond('Autoreader:\n' + '\n'.join(user_list))
+    if config['auto_read'] is None:
+        return
+
+    user_list = await gather(*[get_user(int(i)) for i in config['auto_read']])
+    name_list = [f'{user_to_link(user)}{"silent" if config["auto_read"][str(user.id)] else ""}'
+                 for user in user_list if user is not None]
+    await message.respond('Autoreader:\n' + '\n'.join(name_list))
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader help'))
@@ -75,6 +107,6 @@ async def help(message: Message):
                                      'autoreader help - this message']))
 
 
-for i in config.auto_read:
-    silent = config.auto_read[i]
+for i in config['auto_read']:
+    silent = config['auto_read'][i]
     register_auto_read(int(i), silent)

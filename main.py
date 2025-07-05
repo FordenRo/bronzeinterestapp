@@ -5,8 +5,10 @@ from importlib import import_module
 from io import StringIO
 from logging import StreamHandler
 
+from telethon.tl.custom import Message
+
 from client import bot, client
-from config import config
+from config import save_config
 from utils import TgLogHandler
 
 
@@ -32,9 +34,15 @@ def initiate_handlers():
 
 async def main():
     bot.parse_mode = 'html'
-    me = await client.get_me()
-    msg = await bot.send_message(me.id, 'log')
-    await bot.pin_message(me.id, msg.id)
+
+    if client._self_id is None:
+        raise ValueError('client._self_id is None')
+
+    msg = await bot.send_message(client._self_id, 'log')
+    if not isinstance(msg, Message):
+        raise ValueError('msg is not a Message')
+
+    await bot.pin_message(client._self_id, msg.id)
 
     stream = StreamHandler(StringIO())
     stream.name = 'Stream'
@@ -50,9 +58,9 @@ async def main():
     logging.info('Started successfully')
     await client.disconnected
 
-    await bot.unpin_message(me.id, msg.id)
+    await bot.unpin_message(client._self_id, msg.id)
     logging.info('Stopped')
-    config.save()
+    save_config()
 
 
 if __name__ == '__main__':
@@ -61,4 +69,3 @@ if __name__ == '__main__':
             client.loop.run_until_complete(main())
         except KeyboardInterrupt:
             logging.info('Stopping')
-

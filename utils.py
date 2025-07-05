@@ -13,14 +13,17 @@ def lerp(a, b, t):
     return a * (1 - t) + b * t
 
 
-async def get_user(id: str | int) -> UserEmpty | User | None:
+async def get_user(id: str | int) -> User | None:
     try:
-        return (await client(GetFullUserRequest(id))).users[0]
+        return (await client(GetFullUserRequest(id))).users[0]  # type: ignore
     except ValueError:
         return None
 
 
 def user_to_link(user: User | UserEmpty):
+    if isinstance(user, UserEmpty):
+        return ''
+
     if user.username:
         link = f'tg://resolve?domain={user.username}'
     elif user.phone:
@@ -42,7 +45,11 @@ class TgLogHandler(Handler):
 
     def handle(self, record):
         if record.levelno >= logging.WARN:
-            client.loop.create_task(bot.send_message(client._self_id, f'<pre>{self.format(record)}</pre>'))
+            if client._self_id is None:
+                return
+
+            client.loop.create_task(bot.send_message(
+                client._self_id, f'<pre>{self.format(record)}</pre>'))
             return
 
         self.content += self.format(record) + '\n'
@@ -57,6 +64,9 @@ class TgLogHandler(Handler):
         if len(text) > 2048:
             text = text[-2048:]
             text = '\n'.join(text.splitlines()[1:])
+
+        if self.message is None:
+            return
 
         await self.message.edit(f'<pre>{text}</pre>')
         self._task = None

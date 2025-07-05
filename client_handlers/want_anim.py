@@ -12,26 +12,25 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if 'хочу' not in message.text:
-        return
-    if 'тебя' not in message.text:
+    if not message.text or 'хочу' not in message.text or 'тебя' not in message.text:
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    for i in range(int(lifetime / 5.6)):
+    if not message.text:
+        return
+
+    for _ in range(int(lifetime / 5.6)):
         try:
             await sleep(5)
-            text = message.text
-
-            await message.edit(text.replace('хочу', 'want'))
+            await message.edit(message.text.replace('хочу', 'want'))
             await sleep(0.2)
-            await message.edit(text.replace('хочу', '<s>want</s>'))
+            await message.edit(message.text.replace('хочу', '<s>want</s>'))
             await sleep(0.2)
-            await message.edit(text.replace('хочу', 'want'))
+            await message.edit(message.text.replace('хочу', 'want'))
             await sleep(0.2)
-            await message.edit(text)
+            await message.edit(message.text)
         except MessageIdInvalidError:
             return

@@ -15,24 +15,32 @@ online_task = None
 async def online(message: Message):
     global current_state, online_task
 
-    state = re.match('(be|no) online', message.text).group(1) == 'be'
+    if not message.text:
+        return
 
+    match = re.match('(be|no) online', message.text)
+    if not match:
+        return
+
+    state = match.group(1) == 'be'
     if state != current_state:
         current_state = state
         await message.respond('Now you will be online' if state else 'Always online turned off')
         if state:
             online_task = await always_online_handler()
-        elif not state:
+        elif online_task:
             client.remove_event_handler(online_task)
     else:
         await message.respond('Nothing changed')
 
 
 async def always_online_handler():
-    me = await client.get_me()
+    if client._self_id is None:
+        return
+
     await client(UpdateStatusRequest(offline=False))
 
-    @client.on(UserUpdate([me.id]))
+    @client.on(UserUpdate([client._self_id]))
     async def update(event: UserUpdate.Event):
         if event.status is not UserStatusOnline:
             await client(UpdateStatusRequest(offline=False))

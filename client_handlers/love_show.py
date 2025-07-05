@@ -14,10 +14,7 @@ async def command(message: Message):
 
 
 async def respond(message: Message, text: str):
-    if message:
-        return await message.respond(f'`{text}`', parse_mode='markdown')
-    else:
-        print(text)
+    return await message.respond(f'`{text}`', parse_mode='markdown')
 
 
 def cl_cos(x):
@@ -83,7 +80,8 @@ async def start(message: Message):
         l[x2:x2 + 5] = list(m)
         if i % 5 == 0 and 20 < i < 143:
             hearts += [(w, '❤️' if i % 10 == 0 else '💜️')]
-        hearts = list(filter(lambda x: x[0] >= 0, map(lambda x: (x[0] - 4, x[1]), hearts)))
+        hearts = list(filter(lambda x: x[0] >= 0, map(
+            lambda x: (x[0] - 4, x[1]), hearts)))
         for p in hearts:
             l[p[0]:p[0] + 2] = p[1]
         await respond(message, ''.join(l))
@@ -124,7 +122,11 @@ async def start(message: Message):
 
     messages: list[Message] = []
     for i in heart:
-        messages += [await respond(message, i)]
+        msg = await respond(message, i)
+        if not isinstance(msg, Message):
+            continue
+
+        messages += [msg]
         await sleep(dl * 2)
 
     if message:

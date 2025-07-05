@@ -11,14 +11,21 @@ from client_handlers.read_handler import register_on_read_event
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if not re.search('(?=ха|ах)[ха]{5}', message.text, re.IGNORECASE):
+    if not message.text or not re.search('(?=ха|ах)[ха]{5}', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    part = re.search('(?=[ха]{5})(?=ха|ах)\\w+', message.text, re.IGNORECASE).group()
+    if not message.text:
+        return
+
+    part = re.search('(?=[ха]{5})(?=ха|ах)\\w+', message.text, re.IGNORECASE)
+    if not part:
+        return
+
+    part = part.group()
     for i in range(len(part) * (2 if len(part) < 15 else 1)):
         try:
             await sleep(0.4)

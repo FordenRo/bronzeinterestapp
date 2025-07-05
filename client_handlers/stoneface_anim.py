@@ -12,19 +12,21 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if '-_-' not in message.text:
+    if not message.text or '-_-' not in message.text:
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    for i in range(int(lifetime / 5)):
+    if not message.text:
+        return
+
+    for _ in range(int(lifetime / 5)):
         try:
-            text = message.text
-            await message.edit(text.replace('-_-', '=_='))
+            await message.edit(message.text.replace('-_-', '=_='))
             await sleep(1)
-            await message.edit(text)
+            await message.edit(message.text)
             await sleep(4)
         except MessageIdInvalidError:
             return

@@ -13,16 +13,23 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: Message):
-    if not re.search('люблю', message.text, re.IGNORECASE):
+    if not message.text or not re.search('люблю', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
 
 
 async def anim(message: Message):
-    for k in range(int(lifetime / 11.1)):
+    if not message.text:
+        return
+
+    for _ in range(int(lifetime / 11.1)):
         try:
-            part = re.search('люблю', message.text, re.IGNORECASE).group()
+            part = re.search('люблю', message.text, re.IGNORECASE)
+            if not part:
+                return
+
+            part = part.group()
             for i in range(5):
                 word = list(part)
                 word[i] = word[i].upper() if word[i].islower() else word[i].lower()

@@ -11,17 +11,27 @@ from utils import TgLogHandler
 
 @bot.on(NewMessage(incoming=True, pattern='log send'))
 async def send_log(message: Message):
-    log: StreamHandler | None = logging.getHandlerByName('Stream')
+    log = logging.getHandlerByName('Stream')
+    if not isinstance(log, StreamHandler):
+        return
+
     stream: StringIO = log.stream
 
     io = BytesIO(stream.getvalue().encode('utf8'))
     io.name = 'interest.log'
+
+    if message.chat_id is None:
+        return
+
     await bot.send_file(message.chat_id, io)
 
 
 @bot.on(NewMessage(incoming=True, pattern='log (clear|cls)'))
 async def log_clear(message: Message):
-    log: TgLogHandler | None = logging.getHandlerByName('TelegramLog')
+    log = logging.getHandlerByName('TelegramLog')
+    if not isinstance(log, TgLogHandler):
+        return
+
     log.content = ''
     logging.getLogger('log').info('Cleared')
 

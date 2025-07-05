@@ -31,7 +31,8 @@ async def update(message: Message):
     stdout, _ = await cmd.communicate()
     output = stdout.decode('utf8')
 
-    await message.respond(f'<pre>{output}</pre>')
-
     if 'up to date' not in output:
+        await message.respond(f'<pre>{output}</pre>')
         await restart(message)
+    else:
+        await message.respond('Already up to date')
