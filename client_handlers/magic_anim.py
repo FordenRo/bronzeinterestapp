@@ -23,7 +23,7 @@ async def anim(message: Message):
     for i in range(int(lifetime / 6)):
         try:
             part = re.search('магия', message.text, re.IGNORECASE).group()
-            await message.edit(message.text.replace(part, '<s>magic</s>'), parse_mode='html')
+            await message.edit(message.text.replace(part, '<s>magic</s>'))
             await sleep(3)
             await message.edit(message.text)
             await sleep(3)

@@ -41,7 +41,7 @@ class TgLogHandler(Handler):
 
     def handle(self, record):
         if record.levelno >= logging.WARN:
-            client.loop.create_task(bot.send_message(client._self_id, f'<pre>{self.format(record)}</pre>', parse_mode='html'))
+            client.loop.create_task(bot.send_message(client._self_id, f'<pre>{self.format(record)}</pre>'))
             return
 
         self.content += self.format(record) + '\n'
@@ -52,5 +52,5 @@ class TgLogHandler(Handler):
 
     async def update(self):
         await sleep(0.5)
-        await self.message.edit(f'<pre>{self.content}</pre>', parse_mode='html')
+        await self.message.edit(f'<pre>{self.content}</pre>')
         self._task = None

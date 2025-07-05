@@ -26,11 +26,11 @@ async def anim(message: Message):
             await sleep(5)
             text = message.text
 
-            await message.edit(text.replace('хочу', 'want'), parse_mode='html')
+            await message.edit(text.replace('хочу', 'want'))
             await sleep(0.2)
-            await message.edit(text.replace('хочу', '<s>want</s>'), parse_mode='html')
+            await message.edit(text.replace('хочу', '<s>want</s>'))
             await sleep(0.2)
-            await message.edit(text.replace('хочу', 'want'), parse_mode='html')
+            await message.edit(text.replace('хочу', 'want'))
             await sleep(0.2)
             await message.edit(text)
         except MessageIdInvalidError:
