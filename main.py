@@ -31,8 +31,9 @@ def initiate_handlers():
 
 async def main():
     bot.parse_mode = 'html'
-    msg = await bot.send_message((await client.get_me()).id, 'log')
-    await bot.pin_message(client._self_id, msg.id)
+    me = await client.get_me()
+    msg = await bot.send_message(me.id, 'log')
+    await bot.pin_message(me.id, msg.id)
 
     logging.basicConfig(level=logging.INFO,
                         format='[{asctime} {levelname}] ({name}) {msg}',
@@ -46,7 +47,7 @@ async def main():
     logging.info('Started successfully')
     await client.disconnected
 
-    await bot.unpin_message(client._self_id, msg.id)
+    await bot.unpin_message(me.id, msg.id)
     logging.info('Stopped')
     config.save()
 
