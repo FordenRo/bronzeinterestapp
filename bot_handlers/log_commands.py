@@ -26,3 +26,10 @@ async def log_clear(message: Message):
     logging.getLogger('log').info('Cleared')
 
     await message.respond('Log cleared')
+
+
+@bot.on(NewMessage(incoming=True, pattern='log help'))
+async def log_help(message: Message):
+    await message.respond('\n'.join(['log send - send file with log',
+                                     'log clear|cls - clear log message',
+                                     'log help - this message']))
