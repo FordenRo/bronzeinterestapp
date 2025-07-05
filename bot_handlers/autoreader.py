@@ -12,6 +12,7 @@ from utils import get_user, user_to_link
 
 current_state = False
 tasks = {}
+onetime_tasks = {}
 
 if 'auto_read' not in config:
     config['auto_read'] = {}
@@ -80,20 +81,24 @@ async def autoreader_remove(message: Message):
         await message.respond('User not found')
         return
 
-    if str(user.id) in config['auto_read']:
-        config['auto_read'].pop(str(user.id))
+    if str(user.id) in onetime_tasks:
+        client.remove_event_handler(onetime_tasks[user.id])
+        onetime_tasks.pop(user.id)
+    elif str(user.id) in tasks:
         client.remove_event_handler(tasks[user.id])
-        await message.respond(f'Autoreader removed from {user_to_link(user)}')
+        tasks.pop(user.id)
+        config['auto_read'].pop(str(user.id))
     else:
         await message.respond('User not in autoreader list')
+        return
+
+    await message.respond(f'Autoreader removed from {user_to_link(user)}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader list'))
 async def autoreader_list(message: Message):
-    if config['auto_read'] is None:
-        return
-
     user_list = await gather(*[get_user(int(i)) for i in config['auto_read']])
+    user_list += await gather(*[get_user(int(i)) for i in onetime_tasks])
     name_list = [f'{user_to_link(user)}{"silent" if config["auto_read"][str(user.id)] else ""}'
                  for user in user_list if user is not None]
     await message.respond('Autoreader:\n' + '\n'.join(name_list))
@@ -107,6 +112,5 @@ async def help(message: Message):
                                      'autoreader help - this message']))
 
 
-for i in config['auto_read']:
-    silent = config['auto_read'][i]
-    register_auto_read(int(i), silent)
+[register_auto_read(int(i), config['auto_read'][i])
+ for i in config['auto_read']]
