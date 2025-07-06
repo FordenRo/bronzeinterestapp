@@ -123,5 +123,5 @@ async def spy_help(message: Message):
     await message.respond(help_messages['spy'])
 
 
-[register_spy(v, id) for v in config['spy_list']
+[register_spy(v, int(id)) for v in config['spy_list']
  for id in config['spy_list'][v]]
