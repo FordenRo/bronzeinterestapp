@@ -1,3 +1,4 @@
+import os
 import json
 
 
@@ -31,9 +32,13 @@ help_messages = {
               'update check - проверить доступные обновления',
 }
 
-
-with open('config.json', 'r') as f:
-    config = json.load(f)
+if not os.path.exists('config.json'):
+    with open('config.json', 'w') as f:
+        json.dump({}, f)
+        config = {}
+else:
+    with open('config.json', 'r') as f:
+        config = json.load(f)
 
 
 def save_config():
