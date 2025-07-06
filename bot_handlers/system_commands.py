@@ -64,21 +64,21 @@ async def update_check(message: Message):
 @bot.on(NewMessage(incoming=True, pattern='help'))
 async def help_command(message: Message):
     help_text = [
-        'Системные команды:',
+        '<b>Системные команды:</b>',
         help_messages['system'],
         '',
-        'Автоответчик:',
+        '<b>Автоответчик:</b>',
         help_messages['autoresponder'],
         '',
-        'Авточитатель:',
+        '<b>Авточитатель:</b>',
         help_messages['autoreader'],
         '',
-        'Онлайн статус:',
+        '<b>Онлайн статус:</b>',
         help_messages['online'],
         '',
-        'Логи:',
+        '<b>Логи:</b>',
         help_messages['log'],
         '',
-        'help - показать эту справку'
+        'help - <i>показать эту справку</i>'
     ]
     await message.respond('\n'.join(help_text))
