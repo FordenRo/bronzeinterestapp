@@ -7,7 +7,7 @@ from telethon.tl.custom import Message
 from telethon.tl.types import User
 
 from client import bot, client
-from config import config
+from config import config, help_messages
 from utils import get_user, user_to_link
 
 current_state = False
@@ -33,7 +33,7 @@ async def command(message: Message):
     onetime = bool(onetime)
     user = await get_user(nickname)
     if not user:
-        await message.respond('User not found')
+        await message.respond('Пользователь не найден')
         return
 
     if not onetime:
@@ -41,7 +41,7 @@ async def command(message: Message):
 
     register_auto_read(user.id, silent, onetime)
     await message.respond(
-        f'All messages from {user_to_link(user)} will be read {'silent' if silent else 'and forwarded here'}')
+        f'Все сообщения от {user_to_link(user)} будут прочитаны {'тихо' if silent else 'и пересланы сюда'}')
 
 
 def register_auto_read(id: int, silent: bool, onetime: bool = False):
@@ -56,7 +56,7 @@ def register_auto_read(id: int, silent: bool, onetime: bool = False):
             if client._self_id is None:
                 return
 
-            await bot.send_message(client._self_id, f'Message from {user_to_link(user)}: {message.text}')
+            await bot.send_message(client._self_id, f'Сообщение от {user_to_link(user)}: {message.text}')
 
         if onetime:
             client.remove_event_handler(on_message)
@@ -78,7 +78,7 @@ async def autoreader_remove(message: Message):
     nickname = match.group(1)
     user = await get_user(nickname)
     if not isinstance(user, User):
-        await message.respond('User not found')
+        await message.respond('Пользователь не найден')
         return
 
     if str(user.id) in onetime_tasks:
@@ -89,10 +89,10 @@ async def autoreader_remove(message: Message):
         tasks.pop(user.id)
         config['auto_read'].pop(str(user.id))
     else:
-        await message.respond('User not in autoreader list')
+        await message.respond('Пользователь не в списке авточитателя')
         return
 
-    await message.respond(f'Autoreader removed from {user_to_link(user)}')
+    await message.respond(f'Авточитатель убран от {user_to_link(user)}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader list'))
@@ -101,15 +101,12 @@ async def autoreader_list(message: Message):
     user_list += await gather(*[get_user(int(i)) for i in onetime_tasks])
     name_list = [f'{user_to_link(user)}{"silent" if config["auto_read"][str(user.id)] else ""}'
                  for user in user_list if user is not None]
-    await message.respond('Autoreader:\n' + '\n'.join(name_list))
+    await message.respond('Авточитатель:\n' + '\n'.join(name_list))
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoreader help'))
 async def help(message: Message):
-    await message.respond('\n'.join(['autoreader @nickname silent? onetime? - automaticaly read messages from user',
-                                     'autoreader remove @nickname - remove autoreader from user',
-                                     'autoreader list - autoreader user list',
-                                     'autoreader help - this message']))
+    await message.respond(help_messages['autoreader'])
 
 
 [register_auto_read(int(i), config['auto_read'][i])

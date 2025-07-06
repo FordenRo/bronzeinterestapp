@@ -7,7 +7,7 @@ from telethon.tl.custom import Message
 from telethon.tl.types import User
 
 from client import bot, client
-from config import config
+from config import config, help_messages
 from utils import get_user, user_to_link
 
 tasks = {'online': {}, 'read': {}}
@@ -31,13 +31,13 @@ async def command(message: Message):
     onetime = bool(onetime)
     user = await get_user(nickname)
     if not isinstance(user, User):
-        await message.respond('User not found')
+        await message.respond('Пользователь не найден')
         return
 
     if not onetime:
         config['spy_list'][type] += [user.id]
     register_spy(type, user.id, onetime)
-    await message.respond(f'{user_to_link(user)} will now spy {type}')
+    await message.respond(f'Сделим за {'онлайном' if type == 'online' else 'чтением'} {user_to_link(user)}')
 
 
 def register_spy(type: str, id: int, onetime: bool = False):
@@ -52,7 +52,7 @@ def register_spy(type: str, id: int, onetime: bool = False):
                 if not isinstance(chat, User):
                     return
 
-                await bot.send_message(client._self_id, f'{user_to_link(chat)} is online!')
+                await bot.send_message(client._self_id, f'{user_to_link(chat)} в сети!')
                 if onetime:
                     client.remove_event_handler(on_update)
                     onetime_tasks['online'].pop(id)
@@ -71,7 +71,7 @@ def register_spy(type: str, id: int, onetime: bool = False):
             if not isinstance(chat, User):
                 return
 
-            await bot.send_message(client._self_id, f'{user_to_link(chat)} has read your messages!')
+            await bot.send_message(client._self_id, f'{user_to_link(chat)} прочитал ваши сообщения!')
             if onetime:
                 client.remove_event_handler(on_update)
                 onetime_tasks['read'].pop(id)
@@ -96,7 +96,7 @@ async def remove(message: Message):
     type, nickname = match.groups()
     user = await get_user(nickname)
     if not isinstance(user, User):
-        await message.respond('User not found')
+        await message.respond('Пользователь не найден')
         return
 
     if str(user.id) in onetime_tasks[type]:
@@ -107,10 +107,10 @@ async def remove(message: Message):
         tasks[type].pop(user.id)
         config['spy_list'][type].remove(user.id)
     else:
-        await message.respond('User not in spy list')
+        await message.respond('Пользователь не в списке слежения')
         return
 
-    await message.respond(f'{user_to_link(user)} removed from spy')
+    await message.respond(f'{user_to_link(user)} убран из слежения')
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy list'))
@@ -122,15 +122,12 @@ async def spy_list(message: Message):
     online_list = [user_to_link(user)
                    for user in online_list if user is not None]
     read_list = [user_to_link(user) for user in read_list if user is not None]
-    await message.respond('Online:\n' + '\n'.join(online_list) + '\n\nRead:\n' + '\n'.join(read_list))
+    await message.respond('Онлайн:\n' + '\n'.join(online_list) + '\n\nЧтение:\n' + '\n'.join(read_list))
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy help'))
 async def spy_help(message: Message):
-    await message.respond('\n'.join(['spy online|read @username onetime? - register spy',
-                                     'spy remove online|read @username - remove from spy',
-                                     'spy list - spy user list',
-                                     'spy help - this message']))
+    await message.respond(help_messages['spy'])
 
 
 [register_spy(v, id) for v in config['spy_list']

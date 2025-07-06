@@ -6,6 +6,7 @@ from telethon.tl.functions.account import UpdateStatusRequest
 from telethon.tl.types import UserStatusOnline
 
 from client import bot, client
+from config import help_messages
 
 current_state = False
 online_task = None
@@ -25,13 +26,13 @@ async def online(message: Message):
     state = match.group(1) == 'be'
     if state != current_state:
         current_state = state
-        await message.respond('Now you will be online' if state else 'Always online turned off')
+        await message.respond('Теперь вы будете всегда в онлайне' if state else 'Постоянный онлайн выключен')
         if state:
             online_task = await always_online_handler()
         elif online_task:
             client.remove_event_handler(online_task)
     else:
-        await message.respond('Nothing changed')
+        await message.respond('Ничего не изменилось')
 
 
 async def always_online_handler():
@@ -50,11 +51,9 @@ async def always_online_handler():
 
 @bot.on(NewMessage(incoming=True, pattern='online (state|status)'))
 async def online_state(message: Message):
-    await message.respond(f'Always online is {'on' if current_state else 'off'}')
+    await message.respond(f'Постоянный онлайн {'включен' if current_state else 'выключен'}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='online help'))
 async def online_help(message: Message):
-    await message.respond('\n'.join(['be|no online - turn on|off always online',
-                                     'online state|status - is always online active'
-                                     'online help - this message']))
+    await message.respond(help_messages['online'])

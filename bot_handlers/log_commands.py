@@ -6,6 +6,7 @@ from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
 from client import bot
+from config import help_messages
 from utils import TgLogHandler
 
 
@@ -35,11 +36,9 @@ async def log_clear(message: Message):
     log.content = ''
     logging.getLogger('log').info('Cleared')
 
-    await message.respond('Log cleared')
+    await message.respond('Лог очищен')
 
 
 @bot.on(NewMessage(incoming=True, pattern='log help'))
 async def log_help(message: Message):
-    await message.respond('\n'.join(['log send - send file with log',
-                                     'log clear|cls - clear log message',
-                                     'log help - this message']))
+    await message.respond(help_messages['log'])
