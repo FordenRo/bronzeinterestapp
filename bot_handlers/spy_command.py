@@ -13,7 +13,7 @@ from utils import get_user, user_to_link
 tasks = {'online': {}, 'read': {}}
 
 if 'spy_list' not in config:
-    config['spy_list'] = {'online': [], 'read': []}
+    config['spy_list'] = {'online': {}, 'read': {}}
 
 
 @bot.on(NewMessage(incoming=True, pattern='spy (online|read) @[a-zA-Z0-9_]+ ?(onetime)?'))
