@@ -40,7 +40,8 @@ async def update(message: Message):
 
 @bot.on(NewMessage(incoming=True, pattern='update check'))
 async def update_check(message: Message):
-    cmd = await create_subprocess_shell('git fetch', stdout=PIPE)
+    await (await create_subprocess_shell('git fetch', stdout=PIPE)).communicate()
+    cmd = await create_subprocess_shell('git log --oneline master..origin', stdout=PIPE)
     stdout, _ = await cmd.communicate()
     output = stdout.decode('utf8')
 
