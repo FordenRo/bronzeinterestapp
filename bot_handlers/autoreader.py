@@ -39,6 +39,7 @@ async def command(message: Message):
         'silent': silent,
         'onetime': onetime
     }
+
     register_auto_read(user.id)
     await message.respond(
         f'Все сообщения от {user_to_link(user)} будут прочитаны {'тихо' if silent else 'и пересланы сюда'}{' один раз' if onetime else ''}')

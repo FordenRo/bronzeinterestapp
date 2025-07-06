@@ -34,6 +34,12 @@ async def command(message: Message):
         await message.respond('Пользователь не найден')
         return
 
+    config['auto_respond'][str(user.id)] = {
+        'text': text,
+        'silent': silent,
+        'onetime': onetime
+    }
+
     register_respond(user.id)
     await message.respond(f'Сообщения от {user_to_link(user)} будут отвечены введеным текстом {'тихо' if silent else 'и пересланы сюда'}{' один раз' if onetime else ''}')
 
