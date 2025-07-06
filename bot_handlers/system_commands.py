@@ -38,7 +38,7 @@ async def pull():
     return stdout.decode('utf8')
 
 
-@bot.on(NewMessage(incoming=True, pattern='update'))
+@bot.on(NewMessage(incoming=True, pattern='update$'))
 async def update(message: Message):
     update_log = await get_update_log()
 
