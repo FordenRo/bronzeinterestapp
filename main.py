@@ -70,7 +70,6 @@ async def main():
     logging.info('Started successfully')
     await client.disconnected
 
-    await bot.unpin_message(client._self_id, msg.id)
     logging.info('Stopped')
     save_config()
 
