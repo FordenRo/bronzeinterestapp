@@ -6,10 +6,11 @@ from io import StringIO
 from logging import StreamHandler
 
 from telethon.tl.custom import Message
-from telethon.tl.types import InputMessagesFilterPinned
+from telethon.tl.types import InputMessagesFilterPinned, User
 
 from client import bot, client
 from config import save_config
+from bot_handlers.system_commands import get_update_log
 from utils import TgLogHandler
 
 
@@ -66,6 +67,19 @@ async def main():
     logging.getLogger('telethon.client.updates').setLevel(logging.WARN)
 
     initiate_handlers()
+
+    logging.info('Checking for updates...')
+
+    update_log = await get_update_log()
+    if update_log:
+        me = await bot.get_me()
+        if not isinstance(me, User):
+            raise ValueError('me is not a User')
+
+        logging.info('Updates found, sending message')
+        await bot.send_message(client._self_id, f'Найдены обновления:\n<pre><code class="language-log">{update_log}</code></pre>\nВведите <a href="tg://resolve?domain={me.username}&text=update">update</a> для обновления')
+    else:
+        logging.info('No updates found')
 
     logging.info('Started successfully')
     await client.disconnected
