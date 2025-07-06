@@ -106,7 +106,7 @@ async def autorespond_remove(message: Message):
 @bot.on(NewMessage(incoming=True, pattern='autoresponder list'))
 async def autorespond_list(message: Message):
     user_list = await gather(*[get_user(int(i)) for i in config['auto_respond']])
-    name_list = [f'{user_to_link(user)}{' (тихий)' if config['auto_respond'][str(user.id)]['silent'] else ''}{' (одноразовый)' if config['auto_respond'][str(user.id)]['onetime'] else ''}'
+    name_list = [f'{user_to_link(user)}{' (тихий)' if config['auto_respond'][str(user.id)]['silent'] else ''}{' (одноразовый)' if config['auto_respond'][str(user.id)]['onetime'] else ''} - {config['auto_respond'][str(user.id)]['text']}'
                  for user in user_list if user is not None]
     await message.respond('Автоответчик:\n' + '\n'.join(name_list))
 
