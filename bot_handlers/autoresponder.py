@@ -17,13 +17,13 @@ tasks = {}
 onetime_tasks = {}
 
 
-@bot.on(NewMessage(incoming=True, pattern='autoresponder @[a-zA-Z0-9_]+ ?(silent)? ?(onetime)? .*'))
+@bot.on(NewMessage(incoming=True, pattern='autoresponder @[a-zA-Z0-9_]+ ?(silent)? ?(onetime)? .+'))
 async def command(message: Message):
     if not message.text:
         return
 
     match = re.match(
-        'autoresponder (@[a-zA-Z0-9]+) ?(silent)? ?(onetime)? (.*)', message.text)
+        'autoresponder (@[a-zA-Z0-9_]+) ?(silent)? ?(onetime)? (.+)', message.text)
     if not match:
         return
 
