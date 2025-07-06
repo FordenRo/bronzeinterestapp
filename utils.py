@@ -68,5 +68,5 @@ class TgLogHandler(Handler):
         if self.message is None:
             return
 
-        await self.message.edit(f'<pre><code class="language-log">{'\n'.join(text.splitlines()[::-1])}</code></pre>')
         self._task = None
+        await self.message.edit(f'<pre><code class="language-log">{'\n'.join(text.splitlines()[::-1])}</code></pre>')

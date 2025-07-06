@@ -12,7 +12,7 @@ help_messages = {
            '<code>spy list</code> - <i>список пользователей в слежении</i>\n'
            '<code>spy help</code> - <i>справка по слежению</i>',
 
-    'autoresponder': '<code>autoresponder @nickname silent? text</code> - <i>настроить автоответ</i>\n'
+    'autoresponder': '<code>autoresponder @nickname silent? onetime? text</code> - <i>настроить автоответ</i>\n'
                      '<code>autoresponder remove @nickname</code> - <i>убрать автоответ</i>\n'
                      '<code>autoresponder list</code> - <i>список пользователей в автоответчике</i>\n'
                      '<code>autoresponder help</code> - <i>справка по автоответчику</i>',

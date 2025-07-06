@@ -14,7 +14,6 @@ if 'auto_respond' not in config:
     config['auto_respond'] = {}
 
 tasks = {}
-onetime_tasks = {}
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoresponder @[a-zA-Z0-9_]+ ?(silent)? ?(onetime)? .+'))
@@ -29,16 +28,20 @@ async def command(message: Message):
 
     nickname, silent, onetime, text = match.groups()
     onetime = bool(onetime)
+    silent = bool(silent)
     user = await get_user(nickname)
     if not isinstance(user, User):
         await message.respond('Пользователь не найден')
         return
 
-    register_respond(user.id, text, bool(silent), onetime)
-    await message.respond(f'Сообщения от {user_to_link(user)} будут отвечены введеным текстом {'тихо' if silent else 'и пересланы сюда'}')
+    register_respond(user.id)
+    await message.respond(f'Сообщения от {user_to_link(user)} будут отвечены введеным текстом {'тихо' if silent else 'и пересланы сюда'}{' один раз' if onetime else ''}')
 
 
-def register_respond(id: int, text: str, silent: bool, onetime: bool = False):
+def register_respond(id: int):
+    autorespond = config['auto_respond'][str(id)]
+    text, silent, onetime = autorespond['text'], autorespond['silent'], autorespond['onetime']
+
     @client.on(NewMessage([id], incoming=True))
     async def on_message(message: Message):
         await message.respond(text)
@@ -54,20 +57,18 @@ def register_respond(id: int, text: str, silent: bool, onetime: bool = False):
 
         if onetime:
             client.remove_event_handler(on_message)
-            onetime_tasks.pop(id)
+            tasks.pop(id)
+            config['auto_respond'].pop(str(id))
 
-    if onetime:
-        onetime_tasks[id] = on_message
-    else:
-        tasks[id] = on_message
+    config['auto_respond'][str(id)] = {
+        'text': text,
+        'silent': silent,
+        'onetime': onetime
+    }
 
-        config['auto_respond'][str(id)] = {
-            'text': text,
-            'silent': silent
-        }
-
+    tasks[id] = on_message
     logging.getLogger('autoresponder').info(
-        f'Registered user {id} with text: {text}')
+        f'Registered user {id}{' (silent)' if silent else ''}{' (onetime)' if onetime else ''} with text: {text}')
 
 
 @bot.on(NewMessage(incoming=True, pattern='autoresponder remove @[a-zA-Z0-9_]+'))
@@ -85,10 +86,7 @@ async def autorespond_remove(message: Message):
         await message.respond('Пользователь не найден')
         return
 
-    if str(user.id) in onetime_tasks:
-        client.remove_event_handler(onetime_tasks[user.id])
-        onetime_tasks.pop(user.id)
-    elif str(user.id) in tasks:
+    if str(user.id) in tasks:
         client.remove_event_handler(tasks[user.id])
         tasks.pop(user.id)
         config['auto_respond'].pop(str(user.id))
@@ -102,8 +100,7 @@ async def autorespond_remove(message: Message):
 @bot.on(NewMessage(incoming=True, pattern='autoresponder list'))
 async def autorespond_list(message: Message):
     user_list = await gather(*[get_user(int(i)) for i in config['auto_respond']])
-    user_list += await gather(*[get_user(int(i)) for i in onetime_tasks])
-    name_list = [f'{user_to_link(user)}{"silent" if config["auto_respond"][str(user.id)]["silent"] else ""}'
+    name_list = [f'{user_to_link(user)}{' (тихий)' if config['auto_respond'][str(user.id)]['silent'] else ''}{' (одноразовый)' if config['auto_respond'][str(user.id)]['onetime'] else ''}'
                  for user in user_list if user is not None]
     await message.respond('Автоответчик:\n' + '\n'.join(name_list))
 
@@ -113,5 +110,4 @@ async def autorespond_help(message: Message):
     await message.respond(help_messages['autoresponder'])
 
 
-[register_respond(int(i), config['auto_respond'][i]['text'],
-                  config['auto_respond'][i]['silent']) for i in config['auto_respond']]
+[register_respond(int(i)) for i in config['auto_respond']]
