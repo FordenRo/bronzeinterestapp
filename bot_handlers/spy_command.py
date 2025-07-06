@@ -39,7 +39,7 @@ async def command(message: Message):
 
 
 def register_spy(type: str, id: int):
-    onetime = config['spy_list'][type][id]
+    onetime = config['spy_list'][type][str(id)]
 
     if type == 'online':
         @client.on(UserUpdate([id]))
@@ -56,7 +56,7 @@ def register_spy(type: str, id: int):
                 if onetime:
                     client.remove_event_handler(on_update)
                     tasks['online'].pop(id)
-                    config['spy_list'][type].pop(id)
+                    config['spy_list'][type].pop(str(id))
 
         tasks['online'][id] = on_update
     elif type == 'read':
@@ -73,7 +73,7 @@ def register_spy(type: str, id: int):
             if onetime:
                 client.remove_event_handler(on_update)
                 tasks['read'].pop(id)
-                config['spy_list'][type].pop(id)
+                config['spy_list'][type].pop(str(id))
 
         tasks['read'][id] = on_read
 
@@ -97,9 +97,9 @@ async def remove(message: Message):
         return
 
     if str(user.id) in tasks[type]:
-        client.remove_event_handler(tasks[type][user.id])
-        tasks[type].pop(user.id)
-        config['spy_list'][type].pop(user.id)
+        client.remove_event_handler(tasks[type][str(user.id)])
+        tasks[type].pop(str(user.id))
+        config['spy_list'][type].pop(str(user.id))
     else:
         await message.respond('Пользователь не в списке слежения')
         return
