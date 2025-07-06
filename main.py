@@ -6,6 +6,7 @@ from io import StringIO
 from logging import StreamHandler
 
 from telethon.tl.custom import Message
+from telethon.tl.types import InputMessagesFilterPinned
 
 from client import bot, client
 from config import save_config
@@ -38,11 +39,20 @@ async def main():
     if client._self_id is None:
         raise ValueError('client._self_id is None')
 
+    if bot._self_id is None:
+        raise ValueError('bot._self_id is None')
+
     msg = await bot.send_message(client._self_id, 'log')
     if not isinstance(msg, Message):
         raise ValueError('msg is not a Message')
 
-    await bot.pin_message(client._self_id, msg.id)
+    pinned_messages = await client.get_messages(bot._self_id, filter=InputMessagesFilterPinned, limit=100)
+    if not isinstance(pinned_messages, list):
+        raise ValueError('pinned_messages is not a list')
+
+    pinned_msg: Message
+    for pinned_msg in pinned_messages:
+        await client.unpin_message(bot._self_id, pinned_msg.id)
 
     stream = StreamHandler(StringIO())
     stream.name = 'Stream'
