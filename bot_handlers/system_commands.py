@@ -79,6 +79,6 @@ async def help_command(message: Message):
         '<b>Логи:</b>',
         help_messages['log'],
         '',
-        'help - <i>показать эту справку</i>'
+        '<code>help</code> - <i>показать эту справку</i>'
     ]
     await message.respond('\n'.join(help_text))
