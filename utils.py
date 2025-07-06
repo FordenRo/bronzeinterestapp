@@ -44,7 +44,7 @@ class TgLogHandler(Handler):
         self._task = None
 
     def handle(self, record):
-        if record.levelno >= logging.WARN:
+        if record.levelno >= logging.ERROR:
             if client._self_id is None:
                 return
 
