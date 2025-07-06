@@ -25,14 +25,26 @@ async def restart(message: Message):
     sys.exit()
 
 
-@bot.on(NewMessage(incoming=True, pattern='update'))
-async def update(message: Message):
+async def get_update_log():
+    await (await create_subprocess_shell('git fetch', stdout=PIPE)).communicate()
+    cmd = await create_subprocess_shell('git log --oneline master..origin', stdout=PIPE)
+    stdout, _ = await cmd.communicate()
+    return stdout.decode('utf8')
+
+
+async def pull():
     cmd = await create_subprocess_shell('git pull', stdout=PIPE)
     stdout, _ = await cmd.communicate()
-    output = stdout.decode('utf8')
+    return stdout.decode('utf8')
 
-    if 'up to date' not in output:
-        await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
+
+@bot.on(NewMessage(incoming=True, pattern='update'))
+async def update(message: Message):
+    update_log = await get_update_log()
+
+    if update_log:
+        output = await pull()
+        await message.respond(f'<pre><code class="language-log">{update_log}\n\n{output}</code></pre>')
         await restart(message)
     else:
         await message.respond('Already up to date')
@@ -40,10 +52,7 @@ async def update(message: Message):
 
 @bot.on(NewMessage(incoming=True, pattern='update check'))
 async def update_check(message: Message):
-    await (await create_subprocess_shell('git fetch', stdout=PIPE)).communicate()
-    cmd = await create_subprocess_shell('git log --oneline master..origin', stdout=PIPE)
-    stdout, _ = await cmd.communicate()
-    output = stdout.decode('utf8')
+    output = await get_update_log()
 
     if output:
         await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
