@@ -44,7 +44,7 @@ async def update(message: Message):
 
     if update_log:
         output = await pull()
-        await message.respond(f'<pre><code class="language-log">{update_log}\n\n{output}</code></pre>')
+        await message.respond(f'<pre><code class="language-log">{update_log}\n{output}</code></pre>')
         await restart(message)
     else:
         await message.respond('Already up to date')
