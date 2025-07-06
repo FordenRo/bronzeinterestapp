@@ -36,3 +36,15 @@ async def update(message: Message):
         await restart(message)
     else:
         await message.respond('Already up to date')
+
+
+@bot.on(NewMessage(incoming=True, pattern='update check'))
+async def update_check(message: Message):
+    cmd = await create_subprocess_shell('git fetch', stdout=PIPE)
+    stdout, _ = await cmd.communicate()
+    output = stdout.decode('utf8')
+
+    if output:
+        await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
+    else:
+        await message.respond('No update needed')
