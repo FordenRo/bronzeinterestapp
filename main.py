@@ -16,7 +16,7 @@ from utils import TgLogHandler
 
 def initiate_handlers():
     logging.info('Initiating handlers...')
-    for root, dirs, files in os.walk('handlers'):
+    for root, _, files in os.walk('handlers'):
         for file in files:
             name, ext = os.path.splitext(file)
             if ext != '.py':
@@ -24,11 +24,11 @@ def initiate_handlers():
 
             logging.getLogger(root.replace(os.sep, '.')).info(f'{name}...')
             import_module(f'{root.replace(os.sep, ".")}.{name}')
-            logging.getLogger(root.replace(os.sep, '.')).info(f'\r{name} done')
 
 
 async def main():
     bot.parse_mode = 'html'
+    client.parse_mode = 'html'
 
     if client._self_id is None:
         raise ValueError('client._self_id is None')
