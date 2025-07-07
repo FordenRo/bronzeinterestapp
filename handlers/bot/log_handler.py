@@ -8,6 +8,8 @@ from telethon.tl.custom import Button, Message
 
 from client import bot, client
 
+LOG_MAX_LINES = 40
+
 
 class BotLogHandler(Handler):
     def __init__(self, message: Message):
@@ -57,7 +59,7 @@ class BotLogHandler(Handler):
         buttons = []
 
         lines = self.content.splitlines()
-        total_pages = (len(lines) - 1) // 100
+        total_pages = (len(lines) - 1) // LOG_MAX_LINES
 
         if self.page > 0:
             buttons.append(Button.inline('Назад', f'log {self.page - 1}'))
@@ -70,7 +72,7 @@ class BotLogHandler(Handler):
 
         await self.message.edit(
             '<pre><code class="language-log">'
-            f'{'\n'.join(lines[::-1][self.page * 100:(self.page + 1) * 100])}'
+            f'{'\n'.join(lines[::-1][self.page * LOG_MAX_LINES:(self.page + 1) * LOG_MAX_LINES])}'
             '</code></pre>',
             buttons=buttons if buttons else None
         )
