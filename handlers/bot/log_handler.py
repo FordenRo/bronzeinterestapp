@@ -8,7 +8,7 @@ from telethon.tl.custom import Button, Message
 
 from client import bot, client
 
-LOG_MAX_LINES = 40
+LOG_MAX_LINES = 30
 
 
 class BotLogHandler(Handler):
