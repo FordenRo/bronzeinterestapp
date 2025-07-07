@@ -50,7 +50,7 @@ async def update(message: Message):
     if update_log:
         await responce.edit(f'Найдены обновления:\n<pre><code class="language-log">{update_log}</code></pre>\n<b>Применяю обновления...</b>')
         output = await pull()
-        await message.respond(f'<pre><code class="language-log">{update_log}\n{output}</code></pre>')
+        await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
         await restart(message)
     else:
         await responce.edit('Обновление не требуется')
