@@ -54,13 +54,23 @@ class BotLogHandler(Handler):
 
         self._task = None
 
-        buttons = [[Button.inline('Назад', f'log {self.page - 1}'),
-                    Button.inline('Скачать', 'log download'),
-                    Button.inline('Далее', f'log {self.page + 1}')]]
+        buttons = []
+
+        lines = self.content.splitlines()
+        total_pages = (len(lines) - 1) // 100
+
+        if self.page > 0:
+            buttons.append(Button.inline('Назад', f'log {self.page - 1}'))
+
+        if self.page < total_pages:
+            buttons.append(Button.inline('Далее', f'log {self.page + 1}'))
+
+        if buttons:
+            buttons = [buttons]
 
         await self.message.edit(
             '<pre><code class="language-log">'
-            f'{'\n'.join(self.content.splitlines()[::-1][self.page * 100:(self.page + 1) * 100])}'
+            f'{'\n'.join(lines[::-1][self.page * 100:(self.page + 1) * 100])}'
             '</code></pre>',
             buttons=buttons
         )
