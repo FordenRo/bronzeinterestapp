@@ -6,7 +6,8 @@ from telethon.events import NewMessage
 
 from client import bot
 from config import help_messages
-from utils import NewMessageEvent, TgLogHandler
+from handlers.bot.log_handler import BotLogHandler
+from utils import NewMessageEvent
 
 
 @bot.on(NewMessage(incoming=True, pattern=r'log send'))
@@ -29,7 +30,7 @@ async def send_log(message: NewMessageEvent):
 @bot.on(NewMessage(incoming=True, pattern=r'log (clear|cls)'))
 async def log_clear(message: NewMessageEvent):
     log = logging.getHandlerByName('TelegramLog')
-    if not isinstance(log, TgLogHandler):
+    if not isinstance(log, BotLogHandler):
         return
 
     log.content = ''

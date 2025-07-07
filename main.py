@@ -11,7 +11,7 @@ from telethon.tl.types import InputMessagesFilterPinned, User
 from client import bot, client
 from config import save_config
 from handlers.bot.system_commands import get_update_log
-from utils import TgLogHandler
+from handlers.bot.log_handler import BotLogHandler
 
 
 def initiate_handlers():
@@ -57,7 +57,7 @@ async def main():
                         format='{asctime} [{levelname}] ({name}) {message}',
                         style='{',
                         datefmt='%H:%M',
-                        handlers=[StreamHandler(sys.stdout), TgLogHandler(msg), stream])
+                        handlers=[StreamHandler(sys.stdout), BotLogHandler(msg), stream])
     logging.getLogger('telethon.client.updates').setLevel(logging.WARN)
 
     initiate_handlers()
