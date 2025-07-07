@@ -69,8 +69,8 @@ async def main():
         if not isinstance(me, User):
             raise ValueError('me is not a User')
 
-        logging.info('Updates found, sending message')
-        await bot.send_message(client._self_id, f'Найдены обновления:\n<pre><code class="language-log">{update_log}</code></pre>\nВведите <a href="tg://resolve?domain={me.username}&text=update">update</a> для обновления')
+        logging.info('Update found, sending message')
+        await bot.send_message(client._self_id, f'Найдены обновления:\n\n<pre><code class="language-log">{update_log}</code></pre>\nВведите /update для обновления')
     else:
         logging.info('No updates found')
 
