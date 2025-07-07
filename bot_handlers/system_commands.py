@@ -61,7 +61,7 @@ async def update_check(message: Message):
         await message.respond('Обновление не требуется')
 
 
-@bot.on(NewMessage(incoming=True, pattern='help'))
+@bot.on(NewMessage(incoming=True, pattern='/help'))
 async def help_command(message: Message):
     help_text = [
         '<b>Системные команды:</b>',
