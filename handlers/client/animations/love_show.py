@@ -2,18 +2,17 @@ from asyncio import gather, sleep
 from math import cos
 
 from telethon.events import NewMessage
-from telethon.tl.custom import Message
 
 from client import client
-from utils import lerp
+from utils import lerp, NewMessageEvent
 
 
-@client.on(NewMessage(outgoing=True, pattern='lstart'))
-async def command(message: Message):
+@client.on(NewMessage(outgoing=True, pattern=r'lstart'))
+async def command(message: NewMessageEvent):
     client.loop.create_task(start(message))
 
 
-async def respond(message: Message, text: str):
+async def respond(message: NewMessageEvent, text: str):
     return await message.respond(f'`{text}`', parse_mode='markdown')
 
 
@@ -21,7 +20,7 @@ def cl_cos(x):
     return (cos(x) + 1) / 2
 
 
-async def start(message: Message):
+async def start(message: NewMessageEvent):
     mps = 10
 
     dl = 1 / mps
@@ -120,14 +119,12 @@ async def start(message: Message):
              '.......#############.......',
              '..........#######..........']
 
-    messages: list[Message] = []
+    messages = []
     for i in heart:
         msg = await respond(message, i)
-        if not isinstance(msg, Message):
-            continue
-
-        messages += [msg]
-        await sleep(dl * 2)
+        if msg:
+            messages.append(msg)
+            await sleep(dl * 2)
 
     if message:
         for c in range(15):
@@ -136,6 +133,6 @@ async def start(message: Message):
                 hm = heart[i]
                 if c % 2 == 0:
                     hm = hm.replace('#', '$')
-                tasks += [msg.edit(f'`{hm}`', parse_mode='markdown')]
+                tasks.append(msg.edit(f'`{hm}`', parse_mode='markdown'))
             await gather(*tasks)
             await sleep(1)

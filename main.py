@@ -36,7 +36,8 @@ async def main():
     if bot._self_id is None:
         raise ValueError('bot._self_id is None')
 
-    pinned_messages = await client.get_messages(bot._self_id, filter=InputMessagesFilterPinned, limit=100)
+    pinned_messages = await client.get_messages(bot._self_id, filter=InputMessagesFilterPinned,
+                                                limit=100)
     if not isinstance(pinned_messages, list):
         raise ValueError('pinned_messages is not a list')
 
@@ -70,7 +71,10 @@ async def main():
             raise ValueError('me is not a User')
 
         logging.info('Update found, sending message')
-        await bot.send_message(client._self_id, f'Найдены обновления:\n\n<pre><code class="language-log">{update_log}</code></pre>\nВведите /update для обновления')
+        await bot.send_message(client._self_id,
+                               f'Найдены обновления:\n\n'
+                               f'<pre><code class="language-log">{update_log}</code></pre>\n'
+                               'Введите /update для обновления')
     else:
         logging.info('No updates found')
 

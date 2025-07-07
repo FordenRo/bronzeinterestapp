@@ -7,12 +7,13 @@ from telethon.tl.custom import Message
 
 from client import client
 from handlers.client.read_handler import register_on_read_event
+from utils import NewMessageEvent
 
 lifetime = 60
 
 
 @client.on(NewMessage(outgoing=True))
-async def command(message: Message):
+async def command(message: NewMessageEvent):
     if not message.text or not re.search('люблю', message.text, re.IGNORECASE):
         return
 

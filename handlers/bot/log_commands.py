@@ -3,15 +3,14 @@ from io import BytesIO, StringIO
 from logging import StreamHandler
 
 from telethon.events import NewMessage
-from telethon.tl.custom import Message
 
 from client import bot
 from config import help_messages
-from utils import TgLogHandler
+from utils import NewMessageEvent, TgLogHandler
 
 
-@bot.on(NewMessage(incoming=True, pattern='log send'))
-async def send_log(message: Message):
+@bot.on(NewMessage(incoming=True, pattern=r'log send'))
+async def send_log(message: NewMessageEvent):
     log = logging.getHandlerByName('Stream')
     if not isinstance(log, StreamHandler):
         return
@@ -27,8 +26,8 @@ async def send_log(message: Message):
     await bot.send_file(message.chat_id, io)
 
 
-@bot.on(NewMessage(incoming=True, pattern='log (clear|cls)'))
-async def log_clear(message: Message):
+@bot.on(NewMessage(incoming=True, pattern=r'log (clear|cls)'))
+async def log_clear(message: NewMessageEvent):
     log = logging.getHandlerByName('TelegramLog')
     if not isinstance(log, TgLogHandler):
         return
@@ -39,6 +38,6 @@ async def log_clear(message: Message):
     await message.respond('Лог очищен')
 
 
-@bot.on(NewMessage(incoming=True, pattern='log help'))
-async def log_help(message: Message):
+@bot.on(NewMessage(incoming=True, pattern=r'log help'))
+async def log_help(message: NewMessageEvent):
     await message.respond(help_messages['log'])

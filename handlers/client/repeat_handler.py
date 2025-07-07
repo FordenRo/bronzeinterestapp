@@ -1,29 +1,23 @@
-import re
-
 from telethon.errors import MessageIdInvalidError
 from telethon.events import NewMessage
-from telethon.tl.custom import Message
 
 from client import client
+from utils import NewMessageEvent
 
 lifetime = 60
 
 
-@client.on(NewMessage(outgoing=True, pattern='.r\\d+ .*'))
-async def command(message: Message):
+@client.on(NewMessage(outgoing=True, pattern=r'.r(\d+) (.*)'))
+async def command(message: NewMessageEvent):
     client.loop.create_task(repeat(message))
 
 
-async def repeat(message: Message):
+async def repeat(message: NewMessageEvent):
     if not message.text:
         return
 
     try:
-        match = re.match('.r(\\d+) (.*)', message.text)
-        if not match:
-            return
-
-        count, msg = match.groups()
+        count, msg = message.pattern_match.groups()
         client.loop.create_task(message.delete())
         tasks = []
         for _ in range(int(count)):

@@ -7,11 +7,12 @@ from telethon.tl.custom import Message
 
 from client import client
 from handlers.client.read_handler import register_on_read_event
+from utils import NewMessageEvent
 
 
 @client.on(NewMessage(outgoing=True))
-async def command(message: Message):
-    if not message.text or not re.search('(?=ха|ах)[ха]{5}', message.text, re.IGNORECASE):
+async def command(message: NewMessageEvent):
+    if not message.text or not re.search(r'(?=ха|ах)[ха]{5}', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
@@ -21,7 +22,7 @@ async def anim(message: Message):
     if not message.text:
         return
 
-    part = re.search('(?=[ха]{5})(?=ха|ах)\\w+', message.text, re.IGNORECASE)
+    part = re.search(r'(?=[ха]{5})(?=ха|ах)\w+', message.text, re.IGNORECASE)
     if not part:
         return
 
