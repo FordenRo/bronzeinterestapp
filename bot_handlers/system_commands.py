@@ -17,7 +17,7 @@ async def stop(message: Message):
     sys.exit()
 
 
-@bot.on(NewMessage(incoming=True, pattern='restart'))
+@bot.on(NewMessage(incoming=True, pattern='/restart'))
 async def restart(message: Message):
     await message.respond('Перезапускаю...')
 
@@ -39,7 +39,7 @@ async def pull():
     return stdout.decode('utf8')
 
 
-@bot.on(NewMessage(incoming=True, pattern='update$'))
+@bot.on(NewMessage(incoming=True, pattern='/update'))
 async def update(message: Message):
     update_log = await get_update_log()
 
@@ -51,7 +51,7 @@ async def update(message: Message):
         await message.respond('Обновление не требуется')
 
 
-@bot.on(NewMessage(incoming=True, pattern='update check'))
+@bot.on(NewMessage(incoming=True, pattern='/check_updates'))
 async def update_check(message: Message):
     output = await get_update_log()
 
