@@ -109,11 +109,11 @@ async def remove(message: Message):
 
 @bot.on(NewMessage(incoming=True, pattern='spy list'))
 async def spy_list(message: Message):
-    online_list = await gather(*[get_user(i) for i in config['spy_list']['online']])
-    read_list = await gather(*[get_user(i) for i in config['spy_list']['read']])
-    online_list = [f'{user_to_link(user)}{' (одноразовый)' if config['spy_list']['online'][user.id] else ''}'
+    online_list = await gather(*[get_user(int(i)) for i in config['spy_list']['online']])
+    read_list = await gather(*[get_user(int(i)) for i in config['spy_list']['read']])
+    online_list = [f'{user_to_link(user)}{' (одноразовый)' if config['spy_list']['online'][str(user.id)] else ''}'
                    for user in online_list if user is not None]
-    read_list = [f'{user_to_link(user)}{' (одноразовый)' if config['spy_list']['read'][user.id] else ''}'
+    read_list = [f'{user_to_link(user)}{' (одноразовый)' if config['spy_list']['read'][str(user.id)] else ''}'
                  for user in read_list if user is not None]
     await message.respond('Онлайн:\n' + '\n'.join(online_list) + '\n\nЧтение:\n' + '\n'.join(read_list))
 
