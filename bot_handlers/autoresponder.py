@@ -92,7 +92,7 @@ async def autorespond_remove(message: Message):
         await message.respond('Пользователь не найден')
         return
 
-    if str(user.id) in tasks:
+    if user.id in tasks:
         client.remove_event_handler(tasks[user.id])
         tasks.pop(user.id)
         config['auto_respond'].pop(str(user.id))

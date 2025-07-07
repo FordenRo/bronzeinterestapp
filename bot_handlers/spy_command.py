@@ -96,9 +96,9 @@ async def remove(message: Message):
         await message.respond('Пользователь не найден')
         return
 
-    if str(user.id) in tasks[type]:
-        client.remove_event_handler(tasks[type][str(user.id)])
-        tasks[type].pop(str(user.id))
+    if user.id in tasks[type]:
+        client.remove_event_handler(tasks[type][user.id])
+        tasks[type].pop(user.id)
         config['spy_list'][type].pop(str(user.id))
     else:
         await message.respond('Пользователь не в списке слежения')
