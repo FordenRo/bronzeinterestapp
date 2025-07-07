@@ -71,7 +71,7 @@ def register_spy(type: str, id: int):
 
             await bot.send_message(client._self_id, f'{user_to_link(chat)} прочитал ваши сообщения!')
             if onetime:
-                client.remove_event_handler(on_update)
+                client.remove_event_handler(on_read)
                 tasks['read'].pop(id)
                 config['spy_list'][type].pop(str(id))
 
