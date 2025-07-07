@@ -72,5 +72,5 @@ class BotLogHandler(Handler):
             '<pre><code class="language-log">'
             f'{'\n'.join(lines[::-1][self.page * 100:(self.page + 1) * 100])}'
             '</code></pre>',
-            buttons=buttons
+            buttons=buttons if buttons else None
         )
