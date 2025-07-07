@@ -41,24 +41,33 @@ async def pull():
 
 @bot.on(NewMessage(incoming=True, pattern='/update'))
 async def update(message: Message):
+    responce = await message.respond('Проверяю обновления...')
+    if not isinstance(responce, Message):
+        return
+
     update_log = await get_update_log()
 
     if update_log:
+        await responce.edit(f'Найдены обновления:\n<pre><code class="language-log">{update_log}</code></pre>\n<b>Применяю обновления...</b>')
         output = await pull()
         await message.respond(f'<pre><code class="language-log">{update_log}\n{output}</code></pre>')
         await restart(message)
     else:
-        await message.respond('Обновление не требуется')
+        await responce.edit('Обновление не требуется')
 
 
 @bot.on(NewMessage(incoming=True, pattern='/check_updates'))
 async def update_check(message: Message):
+    responce = await message.respond('Проверяю обновления...')
+    if not isinstance(responce, Message):
+        return
+
     output = await get_update_log()
 
     if output:
-        await message.respond(f'<pre><code class="language-log">{output}</code></pre>')
+        await responce.edit(f'Найдены обновления:\n<pre><code class="language-log">{output}</code></pre>')
     else:
-        await message.respond('Обновление не требуется')
+        await responce.edit('Обновление не требуется')
 
 
 @bot.on(NewMessage(incoming=True, pattern='/help'))
