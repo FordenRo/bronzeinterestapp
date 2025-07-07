@@ -10,28 +10,21 @@ from telethon.tl.types import InputMessagesFilterPinned, User
 
 from client import bot, client
 from config import save_config
-from bot_handlers.system_commands import get_update_log
+from handlers.bot.system_commands import get_update_log
 from utils import TgLogHandler
 
 
 def initiate_handlers():
-    logging.info('Initiating client handlers...')
-    for handler in os.listdir('client_handlers'):
-        name, ext = os.path.splitext(handler)
-        if ext != '.py':
-            continue
+    logging.info('Initiating handlers...')
+    for root, dirs, files in os.walk('handlers'):
+        for file in files:
+            name, ext = os.path.splitext(file)
+            if ext != '.py':
+                continue
 
-        logging.info(f'{name} initiated')
-        import_module(f'client_handlers.{name}')
-
-    logging.info('Initiating bot handlers...')
-    for handler in os.listdir('bot_handlers'):
-        name, ext = os.path.splitext(handler)
-        if ext != '.py':
-            continue
-
-        logging.info(f'{name} initiated')
-        import_module(f'bot_handlers.{name}')
+            logging.getLogger(root.replace(os.sep, '.')).info(f'{name}...')
+            import_module(f'{root.replace(os.sep, ".")}.{name}')
+            logging.getLogger(root.replace(os.sep, '.')).info(f'\r{name} done')
 
 
 async def main():

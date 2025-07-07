@@ -6,7 +6,7 @@ from telethon.events import NewMessage
 from telethon.tl.custom import Message
 
 from client import client
-from client_handlers.read_handler import register_on_read_event
+from handlers.client.read_handler import register_on_read_event
 
 
 @client.on(NewMessage(outgoing=True))
