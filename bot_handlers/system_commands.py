@@ -9,7 +9,7 @@ from client import bot, client
 from config import help_messages
 
 
-@bot.on(NewMessage(incoming=True, pattern='stop'))
+@bot.on(NewMessage(incoming=True, pattern='/stop'))
 async def stop(message: Message):
     await message.respond('Останавливаю...')
 
