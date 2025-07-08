@@ -16,7 +16,7 @@ if 'auto_read' not in config:
 
 
 @bot.on(NewMessage(incoming=True,
-                   pattern=r'autoreader @?([a-zA-Z0-9_]+) ?(silent)? ?(onetime)?'))
+                   pattern=r'autoreader @([a-zA-Z0-9_]+) ?(silent)? ?(onetime)?'))
 async def command(message: NewMessageEvent):
     if not message.text:
         return
@@ -68,7 +68,7 @@ def register_auto_read(id: int):
         f'Registered user {id}{' (silent)' if silent else ''}{' (onetime)' if onetime else ''}')
 
 
-@bot.on(NewMessage(incoming=True, pattern=r'autoreader remove @?([a-zA-Z0-9_]+)'))
+@bot.on(NewMessage(incoming=True, pattern=r'autoreader remove @([a-zA-Z0-9_]+)'))
 async def autoreader_remove(message: NewMessageEvent):
     if not message.text:
         return

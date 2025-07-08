@@ -15,7 +15,7 @@ tasks = {}
 
 
 @bot.on(NewMessage(incoming=True,
-                   pattern=r'autoresponder @?([a-zA-Z0-9_]+) ?(silent)? ?(onetime)? (.+)'))
+                   pattern=r'autoresponder @([a-zA-Z0-9_]+) ?(silent)? ?(onetime)? (.+)'))
 async def command(message: NewMessageEvent):
     if not message.text:
         return
@@ -74,7 +74,7 @@ def register_respond(id: int):
                                             f'{' (onetime)' if onetime else ''} with text: {text}')
 
 
-@bot.on(NewMessage(incoming=True, pattern=r'autoresponder remove @?([a-zA-Z0-9_]+)'))
+@bot.on(NewMessage(incoming=True, pattern=r'autoresponder remove @([a-zA-Z0-9_]+)'))
 async def autorespond_remove(message: NewMessageEvent):
     if not message.text:
         return

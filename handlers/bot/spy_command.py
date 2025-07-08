@@ -14,7 +14,7 @@ if 'spy_list' not in config:
     config['spy_list'] = {'online': {}, 'read': {}}
 
 
-@bot.on(NewMessage(incoming=True, pattern=r'spy (online|read) @?([a-zA-Z0-9_]+) ?(onetime)?'))
+@bot.on(NewMessage(incoming=True, pattern=r'spy (online|read) @([a-zA-Z0-9_]+) ?(onetime)?'))
 async def command(message: NewMessageEvent):
     if not message.text:
         return
@@ -76,7 +76,7 @@ def register_spy(type: str, id: int):
         f'Registered spy {type} on user {id}{' (onetime)' if onetime else ''}')
 
 
-@bot.on(NewMessage(incoming=True, pattern=r'spy remove (online|read) @?([a-zA-Z0-9_]+)'))
+@bot.on(NewMessage(incoming=True, pattern=r'spy remove (online|read) @([a-zA-Z0-9_]+)'))
 async def remove(message: NewMessageEvent):
     if not message.text:
         return
