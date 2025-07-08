@@ -1,3 +1,4 @@
+import re
 from asyncio import sleep
 
 from telethon.errors import MessageIdInvalidError
@@ -13,7 +14,7 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: NewMessageEvent):
-    if not message.text or 'хочу' not in message.text or 'тебя' not in message.text:
+    if not message.text or not re.search(r'хочу тебя', message.text, re.IGNORECASE):
         return
 
     register_on_read_event(message, anim)
