@@ -29,7 +29,6 @@ async def anim(message: Message):
         return
 
     part = part.group()
-
     for _ in range(3):
         try:
             await sleep(3)

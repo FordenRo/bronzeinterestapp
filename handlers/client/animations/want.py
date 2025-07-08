@@ -24,13 +24,18 @@ async def anim(message: Message):
     if not message.text:
         return
 
+    part = re.search(r'хочу тебя', message.text, re.IGNORECASE)
+    if not part:
+        return
+
+    part = part.group()
     for _ in range(int(lifetime / 5.6)):
         try:
             await sleep(5)
 
             for i in range(3):
                 await message.edit(
-                    message.text.replace('хочу', 'want' if i % 2 == 0 else '<s>want</s>'))
+                    message.text.replace(part, 'want' if i % 2 == 0 else '<s>want</s>'))
                 await sleep(0.2)
 
             await message.edit(message.text)

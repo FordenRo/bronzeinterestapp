@@ -1,3 +1,4 @@
+import re
 from asyncio import sleep
 
 from telethon.errors import MessageIdInvalidError
@@ -13,7 +14,7 @@ lifetime = 60
 
 @client.on(NewMessage(outgoing=True))
 async def command(message: NewMessageEvent):
-    if not message.text or '-_-' not in message.text:
+    if not message.text or not re.search(r'-_-', message.text):
         return
 
     register_on_read_event(message, anim)
@@ -23,9 +24,14 @@ async def anim(message: Message):
     if not message.text:
         return
 
+    part = re.search(r'-_-', message.text)
+    if not part:
+        return
+
+    part = part.group()
     for _ in range(int(lifetime / 5)):
         try:
-            await message.edit(message.text.replace('-_-', '=_='))
+            await message.edit(message.text.replace(part, '=_='))
             await sleep(1)
             await message.edit(message.text)
             await sleep(4)

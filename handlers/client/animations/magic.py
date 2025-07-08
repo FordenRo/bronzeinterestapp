@@ -24,13 +24,13 @@ async def anim(message: Message):
     if not message.text:
         return
 
+    part = re.search(r'магия', message.text, re.IGNORECASE)
+    if not part:
+        return
+
+    part = part.group()
     for _ in range(int(lifetime / 6)):
         try:
-            part = re.search('магия', message.text, re.IGNORECASE)
-            if not part:
-                return
-
-            part = part.group()
             await message.edit(message.text.replace(part, '<s>magic</s>'))
             await sleep(3)
             await message.edit(message.text)
