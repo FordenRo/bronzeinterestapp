@@ -29,7 +29,7 @@ async def anim(message: Message):
         return
 
     part = part.group()
-    for _ in range(3):
+    for _ in range(10):
         try:
             await sleep(3)
             eq = len(message.text) == len(part)
